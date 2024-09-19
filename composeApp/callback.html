@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OAuth Callback</title>
+    <script>
+        window.onload = function() {
+            const fragment = window.location.hash.substring(1);
+            const params = new URLSearchParams(fragment);
+            const accessToken = params.get("access_token");
+            const expiresIn = params.get("expires_in");
+            const tokenType = params.get("token_type");
+
+            if (accessToken) {
+                fetch(`http://localhost:8080/token?access_token=${accessToken}&expires_in=${expiresIn}&token_type=${tokenType}`)
+                    .then(response => response.text())
+                    .then(data => {
+                        document.body.innerText = data;
+                    });
+            } else {
+                document.body.innerText = "Authorization failed!";
+            }
+        };
+    </script>
+</head>
+<body>
+Processing...
+</body>
+</html>
