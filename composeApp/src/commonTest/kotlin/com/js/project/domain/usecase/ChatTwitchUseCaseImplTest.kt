@@ -55,7 +55,7 @@ class ChatTwitchUseCaseImplTest {
             timestamp = "2024-09-11T16:01:11.042Z".toInstant()
         )
 
-        coEvery { chatTwitchRepository.getTwitchChat(userTwitch.name) } returns flowOf(chatMessagesFlow)
+        coEvery { chatTwitchRepository.getTwitchChat(userTwitch) } returns flowOf(chatMessagesFlow)
 
         // When
         val result = chatTwitchUseCase.getTwitchChat(userTwitch)
@@ -65,7 +65,7 @@ class ChatTwitchUseCaseImplTest {
             chatMessage shouldBe chatMessagesFlow
         }
 
-        coVerify { chatTwitchRepository.getTwitchChat(userTwitch.name) }
+        coVerify { chatTwitchRepository.getTwitchChat(userTwitch) }
     }
 
     @Test
@@ -80,13 +80,13 @@ class ChatTwitchUseCaseImplTest {
     )
         val emptyChatMessagesFlow: Flow<ChatMessageEntity> = flowOf()
 
-        coEvery { chatTwitchRepository.getTwitchChat(userTwitch.name) } returns emptyChatMessagesFlow
+        coEvery { chatTwitchRepository.getTwitchChat(userTwitch) } returns emptyChatMessagesFlow
 
         // When
         val result = chatTwitchUseCase.getTwitchChat(userTwitch).toList()
 
         // Then
         result.size shouldBe 0
-        coVerify { chatTwitchRepository.getTwitchChat(userTwitch.name) }
+        coVerify { chatTwitchRepository.getTwitchChat(userTwitch) }
     }
 }

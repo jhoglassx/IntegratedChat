@@ -1,6 +1,7 @@
 package com.js.project.data.datasource
 
 
+import com.js.project.provider.DispatcherProvider
 import com.js.project.service.ApiService
 import io.kotest.matchers.shouldBe
 import io.ktor.client.call.body
@@ -24,13 +25,19 @@ class ChatYouTubeLiveIdDataSourceImplTest {
     @MockK
     private lateinit var apiService: ApiService
 
+    @MockK
+    private lateinit var dispatcherProvider: DispatcherProvider
+
     private lateinit var chatYouTubeLiveIdDataSource: ChatYouTubeLiveIdDataSourceImpl
 
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        chatYouTubeLiveIdDataSource = ChatYouTubeLiveIdDataSourceImpl(apiService)
+        chatYouTubeLiveIdDataSource = ChatYouTubeLiveIdDataSourceImpl(
+            apiService = apiService,
+            dispatcherProvider = dispatcherProvider
+        )
 
     }
 

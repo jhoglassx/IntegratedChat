@@ -6,10 +6,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class EmoteRemoteEntity(
-    val start: Int,
-    val end: Int
+    val emoteId: String,
+    val positions: List<EmotePositionRemoteEntity>
 )
-
 
 fun List<EmoteRemoteEntity>.toDomain(): List<EmoteEntity> {
     return this.map{
@@ -18,6 +17,7 @@ fun List<EmoteRemoteEntity>.toDomain(): List<EmoteEntity> {
 }
 
 fun EmoteRemoteEntity.toDomain() = EmoteEntity(
-    end = end,
-    start = start
+    emoteId = emoteId,
+    url = "https://static-cdn.jtvnw.net/emoticons/v2/$emoteId/default/dark/1.0",
+    positions = positions.toDomain()
 )

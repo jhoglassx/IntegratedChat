@@ -17,12 +17,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
+import com.js.project.provider.DispatcherProvider
 import com.js.project.service.ServerService
 import com.js.project.ui.app.App
+import com.js.project.ui.auth.AuthViewModel
 import com.js.project.ui.auth.model.AuthAction
 import com.js.project.ui.auth.model.AuthState
-import com.js.project.ui.auth.AuthViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
@@ -30,6 +30,7 @@ import org.koin.android.ext.android.inject
 class MainActivity : ComponentActivity() {
 
     private val authManager: ServerService by inject()
+    private val dispatcher: DispatcherProvider by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,7 +88,7 @@ class MainActivity : ComponentActivity() {
         authViewModel: AuthViewModel
     ) {
         lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
+            withContext(dispatcher.IO) {
                 val uri = uiState.authTwitchIntent as String
                 handleServerTwitch(authViewModel)
 

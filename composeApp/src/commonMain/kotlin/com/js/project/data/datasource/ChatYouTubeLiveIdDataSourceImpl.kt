@@ -1,12 +1,12 @@
 package com.js.project.data.datasource
 
 import Constants.GOOGLE_TOKEN
+import com.js.project.provider.DispatcherProvider
 import com.js.project.service.ApiService
-import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -17,7 +17,8 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 class ChatYouTubeLiveIdDataSourceImpl(
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val dispatcherProvider : DispatcherProvider,
 ): ChatYouTubeLiveIdDataSource {
 
     override suspend fun getYouTubeLiveChatId(
@@ -41,7 +42,7 @@ class ChatYouTubeLiveIdDataSourceImpl(
         )
 
         if (response.status == HttpStatusCode.OK) {
-            val responseBody = response.body<String>()
+            val responseBody = response.bodyAsText()
             val json = Json.parseToJsonElement(responseBody).jsonObject
             val items = json["items"]?.jsonArray ?: emptyList()
 
@@ -56,5 +57,5 @@ class ChatYouTubeLiveIdDataSourceImpl(
         } else {
             throw Exception("Failed to fetch live chat ID: ${response.status}")
         }
-    }.flowOn(Dispatchers.IO)
+    }.flowOn(dispatcherProvider.IO)
 }

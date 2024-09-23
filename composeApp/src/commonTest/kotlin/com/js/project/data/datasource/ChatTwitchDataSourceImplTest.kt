@@ -4,7 +4,9 @@ package com.js.project.data.datasource
 import Constants.TWITCH_TOKEN
 import com.js.project.data.entity.ChatMessageEntityRemote
 import com.js.project.data.entity.EmoteRemoteEntity
+import com.js.project.domain.entity.UserEntity
 import com.js.project.provider.DispatcherProvider
+import com.js.project.service.ApiService
 import com.js.project.service.TwitchChatService
 import io.kotest.matchers.shouldBe
 import io.mockk.MockKAnnotations
@@ -34,6 +36,8 @@ class ChatTwitchDataSourceImplTest {
     private lateinit var dispatcherProvider: DispatcherProvider
     @MockK
     private lateinit var twitchChatService: TwitchChatService
+    @MockK
+    private lateinit var apiService: ApiService
     private lateinit var chatTwitchDataSource: ChatTwitchDataSourceImpl
     private val testScheduler = TestCoroutineScheduler()
     private val testDispatcher = StandardTestDispatcher(testScheduler)
@@ -46,7 +50,11 @@ class ChatTwitchDataSourceImplTest {
 
         Dispatchers.setMain(testDispatcher)
 
-        chatTwitchDataSource = ChatTwitchDataSourceImpl(twitchChatService)
+        chatTwitchDataSource = ChatTwitchDataSourceImpl(
+            twitchChatService = twitchChatService,
+            dispatcherProvider = dispatcherProvider,
+            apiService = apiService
+        )
     }
 
     @After
@@ -67,11 +75,16 @@ class ChatTwitchDataSourceImplTest {
             displayName = "TestUser",
             timestamp = Instant.fromEpochMilliseconds(1234567890),
             message = "Hello, World!",
-            badges = mapOf("subscriber" to "1"),
-            emotes = mapOf("25" to listOf(EmoteRemoteEntity(0, 4))),
             source = "Twitch",
             channelId = "789",
             channelName = channel
+        )
+        val user = UserEntity(
+            id = "",
+            name = "testUser",
+            email = "email",
+            displayName = "displayName",
+            imageUrl = "imageUrl"
         )
         coEvery {
             twitchChatService.getTwitchChatMessages(
@@ -83,7 +96,7 @@ class ChatTwitchDataSourceImplTest {
 
         // When
         val result = mutableListOf<ChatMessageEntityRemote>()
-        chatTwitchDataSource.getTwitchChat(channel).collect {
+        chatTwitchDataSource.getTwitchChat(user).collect {
             result.add(it)
         }
 
@@ -104,6 +117,13 @@ class ChatTwitchDataSourceImplTest {
         // Given
         val channel = "testChannel"
         val invalidMessage = "invalid message"
+        val user = UserEntity(
+            id = "",
+            name = "testUser",
+            email = "email",
+            displayName = "displayName",
+            imageUrl = "imageUrl"
+        )
         coEvery {
             twitchChatService.getTwitchChatMessages(
                 channel = channel,
@@ -114,7 +134,7 @@ class ChatTwitchDataSourceImplTest {
 
         // When
         val result = mutableListOf<ChatMessageEntityRemote>()
-        chatTwitchDataSource.getTwitchChat(channel).collect {
+        chatTwitchDataSource.getTwitchChat(user).collect {
             result.add(it)
         }
 

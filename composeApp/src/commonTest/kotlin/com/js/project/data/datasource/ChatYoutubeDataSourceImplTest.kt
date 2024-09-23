@@ -117,9 +117,6 @@ class ChatYoutubeDataSourceImplTest {
         chatMessage.id shouldBe "messageId"
         chatMessage.displayName shouldBe "Author"
         chatMessage.message shouldBe "Hello, world!"
-        chatMessage.badges["owner"] shouldBe "Owner"
-        chatMessage.badges["moderator"] shouldBe null
-        chatMessage.badges["member"] shouldBe null
 
         coVerify(exactly = 1) {
             apiService.request(any(), any(), any(), any(), any())

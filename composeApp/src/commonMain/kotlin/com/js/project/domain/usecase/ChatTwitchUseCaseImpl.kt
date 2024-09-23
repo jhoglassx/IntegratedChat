@@ -10,5 +10,5 @@ class ChatTwitchUseCaseImpl(
 ) : ChatTwitchUseCase {
     override suspend fun getTwitchChat(
         userTwitch: UserEntity
-    ): Flow<ChatMessageEntity> = chatTwitchRepository.getTwitchChat(userTwitch.name)
+    ): Flow<ChatMessageEntity> = chatTwitchRepository.getTwitchChat(userTwitch)
 }

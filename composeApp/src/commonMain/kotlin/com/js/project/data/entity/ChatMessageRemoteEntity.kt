@@ -1,5 +1,6 @@
 package com.js.project.data.entity
 
+import com.js.project.domain.entity.BadgeEntity
 import com.js.project.domain.entity.ChatMessageEntity
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
@@ -14,8 +15,8 @@ data class ChatMessageEntityRemote(
     @Contextual
     val timestamp: Instant? = null,
     val message: String = "",
-    val badges: Map<String, String> = emptyMap(),
-    val emotes: Map<String, List<EmoteRemoteEntity>> = emptyMap(),
+    val badges: List<BadgeResponse>? = null,
+    val emotes: List<EmoteRemoteEntity>? = null,
     val source: String = "Twitch",
     val channelId: String? = null,
     val channelName: String? = null
@@ -34,10 +35,13 @@ fun ChatMessageEntityRemote.toDomain() = ChatMessageEntity(
     displayName = displayName,
     timestamp = timestamp,
     message = message,
-    badges = badges,
-    emotes = emotes.mapValues { entry ->
-        entry.value.map { it.toDomain() }
+    badges = badges?.map { badge ->
+        BadgeEntity(
+            badgeType = badge.id,
+            url = badge.image_url_1x
+        )
     },
+    emotes = emotes?.toDomain(),
     source = source,
     channelId = channelId,
     channelName = channelName

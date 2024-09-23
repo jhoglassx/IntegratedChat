@@ -1,23 +1,17 @@
 package com.js.project.domain.entity
 
-import com.js.project.data.entity.EmoteRemoteEntity
 import kotlinx.serialization.Serializable
 
 
 @Serializable
 data class EmoteEntity(
-    val start: Int,
-    val end: Int
+    val emoteId: String,
+    val url: String,
+    val positions: List<EmotePositionEntity>
 )
 
-
-fun List<EmoteEntity>.toRemote(): List<EmoteRemoteEntity> {
-    return this.map{
-        it.toRemote()
-    }
-}
-
-fun EmoteEntity.toRemote() = EmoteRemoteEntity(
-    start = start,
-    end = end
+@Serializable
+data class EmotePositionEntity(
+    val start: Int,
+    val end: Int,
 )

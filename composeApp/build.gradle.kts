@@ -1,7 +1,6 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.io.FileNotFoundException
 import java.util.Locale
 import java.util.Properties
 
@@ -26,6 +25,7 @@ kotlin {
 
     sourceSets {
         val commonMain by getting {
+            //resources.srcDirs("src/commonMain/composeResources")
             kotlin.srcDir("${project.rootDir}/buildConfig")
             dependencies {
                 // Compose
@@ -34,11 +34,13 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.materialIconsExtended)
                 implementation(compose.ui)
+                implementation(compose.material3)
                 implementation(compose.components.resources)
                 implementation(compose.components.uiToolingPreview)
 
                 // Lifecycle
                 implementation(libs.lifecycle.viewmodel)
+                //implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
 
                 // Serialization
                 implementation(libs.kotlinx.serialization.core)
@@ -68,8 +70,12 @@ kotlin {
                 // Navigation
                 implementation(libs.navigation.compose)
 
-                // Material Design
-                implementation(libs.androidx.material3)
+                //Coil
+                implementation(libs.coil.compose.core)
+                implementation(libs.coil.compose)
+                implementation(libs.coil.mp)
+                implementation(libs.coil.network.ktor)
+
             }
         }
 
@@ -86,7 +92,10 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 // Compose
+                implementation(compose.ui)
+                implementation(compose.material)
                 implementation(compose.preview)
+                implementation(libs.androidx.material3)
 
                 // AndroidX
                 implementation(libs.androidx.activity.compose)
@@ -195,6 +204,10 @@ android {
         resources.excludes.add("META-INF/io.netty.versions.properties")
     }
 
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.6.11"
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -206,7 +219,7 @@ android {
 
 compose.desktop {
     application {
-        mainClass = "com.js.project.MainKt"
+        mainClass = "com.js.project.ui.main.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)

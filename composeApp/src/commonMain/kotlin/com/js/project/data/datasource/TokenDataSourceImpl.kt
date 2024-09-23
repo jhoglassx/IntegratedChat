@@ -5,6 +5,7 @@ import com.js.project.provider.DispatcherProvider
 import com.js.project.service.ApiService
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
@@ -41,8 +42,9 @@ class TokenDataSourceImpl(
         )
 
         if (response.status == HttpStatusCode.OK) {
-            val responseBody = response.body<String>()
+            val responseBody = response.bodyAsText()
             val json = Json.parseToJsonElement(responseBody).jsonObject
+
             emit(
                 TokenResponseRemoteEntity(
                     accessToken = json["access_token"]?.jsonPrimitive?.content ?: "",
