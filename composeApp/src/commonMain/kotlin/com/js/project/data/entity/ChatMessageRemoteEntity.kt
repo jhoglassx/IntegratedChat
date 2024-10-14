@@ -15,8 +15,8 @@ data class ChatMessageEntityRemote(
     @Contextual
     val timestamp: Instant? = null,
     val message: String = "",
-    val badges: List<BadgeResponse>? = null,
-    val emotes: List<EmoteRemoteEntity>? = null,
+    val badges: List<BadgeResponse>? = listOf(),
+    val emotes: List<EmoteRemoteEntity>? = listOf(),
     val source: String = "Twitch",
     val channelId: String? = null,
     val channelName: String? = null

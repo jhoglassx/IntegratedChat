@@ -2,7 +2,6 @@ package com.js.project.ui.chat
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation.Vertical
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,24 +25,13 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -52,7 +40,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
 import com.js.project.domain.entity.ChatMessageEntity
@@ -62,7 +49,6 @@ import com.js.project.domain.entity.processYouTubeMessage
 import com.js.project.ui.auth.model.AuthState
 import com.js.project.ui.chat.model.ChatAction
 import com.js.project.ui.chat.model.ChatState
-import com.js.project.ui.navigation.ChatNavigation
 import integratedchat.composeapp.generated.resources.Res
 import integratedchat.composeapp.generated.resources.ic_twitch
 import integratedchat.composeapp.generated.resources.ic_youtube
@@ -75,10 +61,8 @@ import org.koin.compose.koinInject
 
 @Composable
 fun ChatScreen(
-    authState: AuthState,
-    onSignInGoogle: () -> Unit,
-    onSignInTwitch: () -> Unit,
-    navController: NavHostController,
+    innerPadding : PaddingValues,
+    authState: AuthState
 ) {
 
     val viewModel: ChatViewModel = koinInject ()
@@ -90,94 +74,13 @@ fun ChatScreen(
             userTwitch = authState.userTwitch
         ))
     }
-
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            topBar(
-                authState = authState,
-                onSignInGoogle = onSignInGoogle,
-                onSignInTwitch = onSignInTwitch,
-                screanName = ChatNavigation.route
-            )
-        }
-    ) { innerPadding ->
-        ChatMessage(
-            innerPadding = innerPadding,
-            chatState = uiState
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun topBar(
-    authState: AuthState,
-    onSignInGoogle: () -> Unit,
-    onSignInTwitch: () -> Unit,
-    screanName: String,
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    CenterAlignedTopAppBar(
-        title = { Text(screanName) },
-        actions = {
-            Icon(
-                painter = painterResource(Res.drawable.ic_youtube),
-                contentDescription = "YouTube Logged In",
-                tint = if(authState.userGoggle != null) Color(0xFFFF0000)  else Color.DarkGray,
-                modifier = Modifier
-                    .height(25.dp)
-                    .clickable {
-                         onSignInGoogle()
-                    }
-            )
-            Spacer(modifier = Modifier.padding(2.dp))
-            Icon(
-                painter = painterResource(Res.drawable.ic_twitch),
-                tint = if(authState.userTwitch != null) Color(0xFF9146FF) else Color.DarkGray,
-                contentDescription = "Twitch Logged In",
-                modifier = Modifier
-                    .height(25.dp)
-                    .clickable {
-                        onSignInTwitch()
-                    }
-            )
-
-            Box {
-
-                IconButton(onClick = { expanded = true }) {
-                    Icon(Icons.Default.MoreVert, contentDescription = "Menu")
-                }
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    if (authState.userGoggle == null) {
-                        DropdownMenuItem(
-                            text = {Text("Login YouTube")},
-                            onClick = { onSignInGoogle() }
-                        )
-                    }
-
-                    if (authState.userTwitch == null) {
-                        DropdownMenuItem(
-                            text = { Text("Login Twitch") },
-                            onClick = { onSignInTwitch() }
-                        )
-                    }
-
-                    if (authState.userTwitch != null || authState.userGoggle == null) {
-                        DropdownMenuItem(
-                            text = { Text("logout") },
-                            onClick = { }
-                        )
-                    }
-                }
-            }
-        }
+    ChatMessage(
+        innerPadding = innerPadding,
+        chatState = uiState
     )
 }
+
+
 
 @Composable
 fun ChatMessage(
@@ -305,14 +208,13 @@ fun SourceImg(source:String) {
 
 @Composable
 fun ChatMessageTwitchView(chatMessage: ChatMessageEntity) {
-    val emojiFont = FontFamily(Font(Res.font.noto_color_emoji, weight = FontWeight.Normal))
     val processedMessage = chatMessage.processTwitchMessage()
     processedMessage.forEach { part ->
         part.text?.let {
             Text(
                 text = it,
                 overflow = TextOverflow.Clip,
-                style = MaterialTheme.typography.body1.copy(fontFamily = emojiFont)
+                style = MaterialTheme.typography.body1
             )
         }
         part.imageUrl?.let { imageUrl ->
@@ -353,6 +255,7 @@ fun ChatMessageGoggleView(chatMessage: ChatMessageEntity) {
 fun ChatScreenPreview(){
     val navController = rememberNavController()
     ChatScreen(
+        innerPadding = PaddingValues(12.dp),
         authState = AuthState(
             authGoogleIntent = "",
             authTwitchIntent = "",
@@ -371,9 +274,6 @@ fun ChatScreenPreview(){
                 imageUrl = "userGoggle_imageUrl"
             ),
             twitchCode = ""
-        ),
-        onSignInGoogle = {},
-        onSignInTwitch = {},
-        navController = navController,
+        )
     )
 }
