@@ -1,3 +1,6 @@
+import com.js.project.data.entity.BadgeResponse
+import java.util.concurrent.ConcurrentHashMap
+
 object Constants {
     //GOOGLE
     const val GOOGLE_DESKTOP_REDIRECT_URI = "http://localhost:8081/callback"
@@ -13,5 +16,6 @@ object Constants {
     const val TWITCH_SCOPES = "user:read:email chat:read chat:edit"
     const val TWITCH_TOKEN_URL = "https://id.twitch.tv/oauth2/token"
     const val TWITCH_USER_INFO_URL = "https://api.twitch.tv/helix/users"
+    val TWITCH_EMOTE_CACHE = ConcurrentHashMap<String, BadgeResponse>()
     var TWITCH_TOKEN = ""
 }

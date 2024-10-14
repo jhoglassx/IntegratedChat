@@ -3,10 +3,11 @@ package com.js.project.data.datasource
 
 import Constants.TWITCH_TOKEN
 import com.js.project.data.entity.ChatMessageEntityRemote
+import com.js.project.data.entity.EmotePositionRemoteEntity
 import com.js.project.data.entity.EmoteRemoteEntity
 import com.js.project.domain.entity.UserEntity
+import com.js.project.provider.BadgeCache
 import com.js.project.provider.DispatcherProvider
-import com.js.project.service.ApiService
 import com.js.project.service.TwitchChatService
 import io.kotest.matchers.shouldBe
 import io.mockk.MockKAnnotations
@@ -18,6 +19,7 @@ import io.mockk.mockk
 import io.mockk.unmockkAll
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
@@ -37,7 +39,7 @@ class ChatTwitchDataSourceImplTest {
     @MockK
     private lateinit var twitchChatService: TwitchChatService
     @MockK
-    private lateinit var apiService: ApiService
+    private lateinit var badgeCache: BadgeCache
     private lateinit var chatTwitchDataSource: ChatTwitchDataSourceImpl
     private val testScheduler = TestCoroutineScheduler()
     private val testDispatcher = StandardTestDispatcher(testScheduler)
@@ -51,9 +53,8 @@ class ChatTwitchDataSourceImplTest {
         Dispatchers.setMain(testDispatcher)
 
         chatTwitchDataSource = ChatTwitchDataSourceImpl(
-            twitchChatService = twitchChatService,
-            dispatcherProvider = dispatcherProvider,
-            apiService = apiService
+            badgeCache = badgeCache,
+            twitchChatService = twitchChatService
         )
     }
 
@@ -67,25 +68,33 @@ class ChatTwitchDataSourceImplTest {
     fun `getTwitchChat should emit parsed chat messages`() = runTest {
         // Given
         val channel = "testChannel"
-        val twitchMessage = "id=123;user-id=456;login=testUser;display-name=TestUser;badges=subscriber/1;color=#1E90FF;emotes=25:0-4;tmi-sent-ts=1234567890;room-id=789 :testUser!testUser@testUser.tmi.twitch.tv PRIVMSG #$channel :Hello, World!"
+        val twitchMessage = "id=123;user-id=456;login=testChannel;display-name=testChannel;badges=subscriber/1;color=#1E90FF;emotes=25:0-4;tmi-sent-ts=1234567890;room-id=789 :testUser!testUser@testUser.tmi.twitch.tv PRIVMSG #$channel :Hello, World!"
         val chatMessageEntityRemote = ChatMessageEntityRemote(
             id = "123",
             userId = "456",
-            userName = "testUser",
-            displayName = "TestUser",
+            userName = channel,
+            displayName = channel,
             timestamp = Instant.fromEpochMilliseconds(1234567890),
             message = "Hello, World!",
             source = "Twitch",
             channelId = "789",
-            channelName = channel
+            channelName = channel,
+            emotes = listOf(EmoteRemoteEntity(emoteId = "25", positions = listOf(
+                EmotePositionRemoteEntity(0,4)
+            )))
         )
         val user = UserEntity(
             id = "",
-            name = "testUser",
+            name = channel,
             email = "email",
             displayName = "displayName",
             imageUrl = "imageUrl"
         )
+
+        coEvery {
+            badgeCache.start()
+        } returns Unit
+
         coEvery {
             twitchChatService.getTwitchChatMessages(
                 channel = channel,
@@ -115,8 +124,6 @@ class ChatTwitchDataSourceImplTest {
     @Test
     fun `getTwitchChat should not emit when message is invalid`() = runTest {
         // Given
-        val channel = "testChannel"
-        val invalidMessage = "invalid message"
         val user = UserEntity(
             id = "",
             name = "testUser",
@@ -124,26 +131,32 @@ class ChatTwitchDataSourceImplTest {
             displayName = "displayName",
             imageUrl = "imageUrl"
         )
+
+        coEvery { badgeCache.start() } returns Unit
         coEvery {
             twitchChatService.getTwitchChatMessages(
-                channel = channel,
-                twitchUsername = channel,
+                twitchUsername = user.name,
+                channel = user.name,
                 twitchToken = TWITCH_TOKEN
             )
-        } returns flowOf(invalidMessage)
+        } returns flow {
+            emit(null.toString())
+        }
 
         // When
         val result = mutableListOf<ChatMessageEntityRemote>()
-        chatTwitchDataSource.getTwitchChat(user).collect {
-            result.add(it)
-        }
+        val flow = chatTwitchDataSource.getTwitchChat(user)
+        flow.collect { result.add(it) }
 
         // Then
         result.size shouldBe 0
         coVerify {
+            badgeCache.start()
+        }
+        coVerify {
             twitchChatService.getTwitchChatMessages(
-                channel = channel,
-                twitchUsername = channel,
+                twitchUsername = user.name,
+                channel = user.name,
                 twitchToken = TWITCH_TOKEN
             )
         }
