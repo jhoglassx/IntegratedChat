@@ -1,5 +1,7 @@
 package com.js.project.di
 
+import com.js.project.provider.BadgeCache
+import com.js.project.provider.BadgeCacheImpl
 import com.js.project.service.ApiService
 import com.js.project.service.ApiServiceImpl
 import com.js.project.service.TwitchChatService
@@ -11,4 +13,5 @@ import org.koin.dsl.module
 val serviceModule = module {
     singleOf(::TwitchChatServiceImpl).bind<TwitchChatService>()
     singleOf(::ApiServiceImpl).bind<ApiService>()
+    singleOf(::BadgeCacheImpl).bind<BadgeCache>()
 }
