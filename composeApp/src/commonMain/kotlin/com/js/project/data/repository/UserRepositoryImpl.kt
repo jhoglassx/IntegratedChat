@@ -4,6 +4,7 @@ import co.touchlab.kermit.Logger
 import com.js.project.data.datasource.UserDataSource
 import com.js.project.data.entity.toRemote
 import com.js.project.domain.entity.UserEntity
+import com.js.project.ext.info
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.last
@@ -23,11 +24,10 @@ class UserRepositoryImpl(
             clientId = clientId
         ).last().toRemote()
 
-        Logger.i(
-            tag = "UserRepositoryImpl", Throwable(result.toString())
-        ) {
-            "fetchUserGoogle -> result: $result"
-        }
+        Logger.info(
+            tag = "UserRepositoryImpl",
+            message = "fetchUserGoogle -> result: $result"
+        )
 
         emit(result)
     }
@@ -43,11 +43,10 @@ class UserRepositoryImpl(
            clientId = clientId
        ).last().toRemote()
 
-        Logger.i(
-            tag = "UserRepositoryImpl", Throwable(result.toString())
-        ) {
-            "fetchUserTwitch -> result: $result"
-        }
+        Logger.info(
+            tag = "UserRepositoryImpl",
+            message = "fetchUserTwitch -> result: $result"
+        )
 
         emit(result)
     }
