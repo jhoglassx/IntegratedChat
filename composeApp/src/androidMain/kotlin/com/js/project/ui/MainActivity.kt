@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import co.touchlab.kermit.Logger
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.js.project.provider.DispatcherProvider
@@ -22,7 +23,6 @@ import com.js.project.ui.app.App
 import com.js.project.ui.auth.AuthViewModel
 import com.js.project.ui.auth.model.AuthAction
 import com.js.project.ui.auth.model.AuthState
-import io.github.aakira.napier.Napier
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
@@ -105,9 +105,19 @@ class MainActivity : ComponentActivity() {
         authManager.server(8080) { code ->
             if (code != null) {
                 authViewModel.onAction(AuthAction.GetTwitchUser(code))
-                Napier.i("MainActivity -> handleServerTwitch: Authorization code received: $code")
+
+                Logger.i(
+                    tag = "MainActivity", Throwable(code.toString())
+                ) {
+                    "handleServerTwitch -> Authorization code received: $code"
+                }
+
             } else {
-                Napier.e("MainActivity -> handleServerTwitch: Authorization code not found")
+                Logger.e(
+                    tag = "MainActivity", Throwable()
+                ) {
+                    "handleServerTwitch -> handleServerTwitch: Authorization code not found"
+                }
             }
             authManager.server(8080){}.stop(1000, 10000)
         }

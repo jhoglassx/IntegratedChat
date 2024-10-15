@@ -5,12 +5,12 @@ import Constants.TWITCH_SCOPES
 import Constants.TWITCH_TOKEN
 import Constants.TWITCH_TOKEN_URL
 import Constants.TWITCH_USER_INFO_URL
+import co.touchlab.kermit.Logger
 import com.google.android.gms.common.api.ApiException
 import com.js.project.data.repository.TokenRepository
 import com.js.project.data.repository.UserRepository
 import com.js.project.domain.entity.UserEntity
 import com.js.project.provider.KeysConfig
-import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.last
@@ -40,7 +40,11 @@ actual class AuthTwitchUseCase(
 
         var user: UserEntity? = null
 
-        Napier.i("AuthTwitchUseCase -> getUser -> authorizationCode: $authorizationCode")
+        Logger.i(
+            tag = "AuthTwitchUseCase", Throwable(authorizationCode)
+        ) {
+            "getUser -> authorizationCode: $authorizationCode"
+        }
 
         try {
             val tokenResponse = tokenRepository.fetchToken(
@@ -57,13 +61,26 @@ actual class AuthTwitchUseCase(
                 KeysConfig.twitchClientId
             ).last()
 
-            Napier.i("AuthTwitchUseCase -> getUser -> user: $user")
+            Logger.i(
+                tag = "AuthTwitchUseCase", Throwable(user.toString())
+            ) {
+                "getUser -> user: $user"
+            }
 
             TWITCH_TOKEN = tokenResponse.accessToken
-            Napier.i("AuthTwitchUseCase -> getUser -> TWITCH_TOKEN: $TWITCH_TOKEN")
+
+            Logger.i(
+                tag = "AuthTwitchUseCase", Throwable(TWITCH_TOKEN)
+            ) {
+                "getUser -> TWITCH_TOKEN: $TWITCH_TOKEN"
+            }
 
         } catch (e: ApiException) {
-            Napier.e("AuthTwitchUseCase -> getUser: $e")
+            Logger.e(
+                tag = "AuthTwitchUseCase", e
+            ) {
+                "getUser: $e"
+            }
         }
 
         user?.let {
