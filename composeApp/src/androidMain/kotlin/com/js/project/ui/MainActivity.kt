@@ -3,7 +3,6 @@ package com.js.project.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -23,6 +22,7 @@ import com.js.project.ui.app.App
 import com.js.project.ui.auth.AuthViewModel
 import com.js.project.ui.auth.model.AuthAction
 import com.js.project.ui.auth.model.AuthState
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
@@ -105,9 +105,9 @@ class MainActivity : ComponentActivity() {
         authManager.server(8080) { code ->
             if (code != null) {
                 authViewModel.onAction(AuthAction.GetTwitchUser(code))
-                Log.d("AuthCallback", "Authorization code received: $code")
+                Napier.i("MainActivity -> handleServerTwitch: Authorization code received: $code")
             } else {
-                Log.e("AuthCallback", "Authorization code not found")
+                Napier.e("MainActivity -> handleServerTwitch: Authorization code not found")
             }
             authManager.server(8080){}.stop(1000, 10000)
         }
@@ -115,7 +115,7 @@ class MainActivity : ComponentActivity() {
 }
 
 
-@Preview
+@Preview(device = "id:Nexus 10")
 @Composable
 fun AppAndroidPreview() {
     //App(userInfo, { signIn() }) { signOut() }

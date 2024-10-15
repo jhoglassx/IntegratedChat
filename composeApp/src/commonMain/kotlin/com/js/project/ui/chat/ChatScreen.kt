@@ -1,6 +1,5 @@
 package com.js.project.ui.chat
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation.Vertical
 import androidx.compose.foundation.gestures.scrollable
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,26 +34,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.js.project.data.datasource.SourceEnum
 import com.js.project.domain.entity.ChatMessageEntity
-import com.js.project.domain.entity.UserEntity
-import com.js.project.domain.entity.processTwitchMessage
-import com.js.project.domain.entity.processYouTubeMessage
+import com.js.project.domain.entity.processMessage
 import com.js.project.ui.auth.model.AuthState
 import com.js.project.ui.chat.model.ChatAction
 import com.js.project.ui.chat.model.ChatState
-import integratedchat.composeapp.generated.resources.Res
-import integratedchat.composeapp.generated.resources.ic_twitch
-import integratedchat.composeapp.generated.resources.ic_youtube
-import integratedchat.composeapp.generated.resources.noto_color_emoji
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.Font
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 
@@ -79,8 +69,6 @@ fun ChatScreen(
         chatState = uiState
     )
 }
-
-
 
 @Composable
 fun ChatMessage(
@@ -151,64 +139,41 @@ fun ChatMessage(
 fun ChatMessageItem(
     chatMessage: ChatMessageEntity
 ) {
-    Row(
+    Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.LightGray)
-            .padding(8.dp),
-        verticalAlignment = Alignment.Top
+            .background(chatMessage.source.color)
+            .fillMaxSize()
+            .padding(start = 8.dp)
     ) {
-        Column(
-            modifier = Modifier.weight(1f)
+        FlowRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.LightGray)
+                .padding(4.dp)
         ) {
-            FlowRow(
-                //horizontalArrangement = Arrangement.spacedBy(2.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                SourceImg(chatMessage.source)
-                Spacer(modifier = Modifier.padding(2.dp))
-                chatMessage.badges?.forEach { badge ->
-                    AsyncImage(
-                        model = badge.url,
-                        contentDescription = null,
-                        modifier = Modifier.size(26.dp),
-                        contentScale = ContentScale.Crop,
-                    )
-                }
-                Spacer(modifier = Modifier.padding(2.dp))
-                Text(
-                    text = chatMessage.displayName,
-                    fontWeight = FontWeight.Bold,
+            chatMessage.badges?.forEach { badge ->
+                AsyncImage(
+                    model = badge.url,
+                    contentDescription = null,
+                    modifier = Modifier.padding(4.dp),
+                    contentScale = ContentScale.Crop,
                 )
-                Spacer(modifier = Modifier.padding(2.dp))
-                ChatMessageTwitchView(chatMessage)
             }
+            Text(
+                text = chatMessage.displayName,
+                style = MaterialTheme.typography.body1.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 10.sp
+                )
+            )
+            ChatMessageView(chatMessage)
         }
     }
 }
 
 @Composable
-fun SourceImg(source:String) {
-    if(source == "Twitch") {
-        Image(
-            painter = painterResource(Res.drawable.ic_twitch),
-            contentDescription = null,
-            modifier = Modifier.size(26.dp),
-            contentScale = ContentScale.Crop,
-        )
-    } else {
-        Image(
-            painter = painterResource(Res.drawable.ic_youtube),
-            contentDescription = null,
-            modifier = Modifier.size(26.dp),
-            contentScale = ContentScale.Crop,
-        )
-    }
-}
-
-@Composable
-fun ChatMessageTwitchView(chatMessage: ChatMessageEntity) {
-    val processedMessage = chatMessage.processTwitchMessage()
+fun ChatMessageView(chatMessage: ChatMessageEntity) {
+    val processedMessage = chatMessage.processMessage()
     processedMessage.forEach { part ->
         part.text?.let {
             Text(
@@ -228,52 +193,36 @@ fun ChatMessageTwitchView(chatMessage: ChatMessageEntity) {
     }
 }
 
-@Composable
-fun ChatMessageGoggleView(chatMessage: ChatMessageEntity) {
-    val processedMessage = chatMessage.processYouTubeMessage()
-    processedMessage.forEach { part ->
-        part.text?.let {
-            Text(
-                text = it,
-                overflow = TextOverflow.Clip,
-                style = MaterialTheme.typography.body1
-            )
-        }
-        part.imageUrl?.let { imageUrl ->
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = null,
-                modifier = Modifier.size(26.dp),
-                contentScale = ContentScale.Crop,
-            )
-        }
-    }
-}
-
-@Composable
 @Preview
-fun ChatScreenPreview(){
-    val navController = rememberNavController()
-    ChatScreen(
-        innerPadding = PaddingValues(12.dp),
-        authState = AuthState(
-            authGoogleIntent = "",
-            authTwitchIntent = "",
-            userTwitch = UserEntity(
-                id = "userTwitch_1",
-                name = "userTwitch_name",
-                email = "userTwitch_email",
-                displayName = "userTwitch_displayName",
-                imageUrl = "userTwitch_imageUrl"
+@Composable
+fun ChatMessagePreview1(){
+    val chatState = ChatState(
+        chatMessages = mutableListOf(
+            ChatMessageEntity(
+                id = "chatMessage_1",
+                userId = "userId_1",
+                userName = "userName_1",
+                displayName = "displayName_1",
+                message = "message_1",
+                source = SourceEnum.TWITCH,
+                channelId = "channelId_1",
+                channelName = "channelName_1"
             ),
-            userGoggle = UserEntity(
-                id = "userGoggle_1",
-                name = "userGoggle_name",
-                email = "userGoggle_email",
-                displayName = "userGoggle_displayName",
-                imageUrl = "userGoggle_imageUrl"
-            ),
-            twitchCode = ""
+            ChatMessageEntity(
+                id = "chatMessage_2",
+                userId = "userId_2",
+                userName = "userName_2",
+                displayName = "displayName_2",
+                message = "message_2",
+                source = SourceEnum.YOUTUBE,
+                channelId = "channelId_2",
+                channelName = "channelName_2"
+            )
         )
+    )
+
+    ChatMessage(
+        innerPadding = PaddingValues(12.dp),
+        chatState = chatState
     )
 }

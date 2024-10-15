@@ -28,12 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.js.project.data.datasource.SourceEnum
 import com.js.project.ui.auth.model.AuthState
 import com.js.project.ui.chat.ChatScreen
 import com.js.project.ui.navigation.ChatNavigation
-import integratedchat.composeapp.generated.resources.Res
-import integratedchat.composeapp.generated.resources.ic_twitch
-import integratedchat.composeapp.generated.resources.ic_youtube
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -87,22 +85,22 @@ fun topBar(
         title = { Text(screanName) },
         actions = {
             Icon(
-                painter = painterResource(Res.drawable.ic_youtube),
+                painter = painterResource(SourceEnum.YOUTUBE.icon),
                 contentDescription = "YouTube Logged In",
                 tint = if(authState.userGoggle != null) Color(0xFFFF0000)  else Color.DarkGray,
                 modifier = Modifier
-                    .height(25.dp)
+                    .height(24.dp)
                     .clickable {
                         onSignInGoogle()
                     }
             )
             Spacer(modifier = Modifier.padding(2.dp))
             Icon(
-                painter = painterResource(Res.drawable.ic_twitch),
+                painter = painterResource(SourceEnum.TWITCH.icon),
                 tint = if(authState.userTwitch != null) Color(0xFF9146FF) else Color.DarkGray,
                 contentDescription = "Twitch Logged In",
                 modifier = Modifier
-                    .height(25.dp)
+                    .height(24.dp)
                     .clickable {
                         onSignInTwitch()
                     }

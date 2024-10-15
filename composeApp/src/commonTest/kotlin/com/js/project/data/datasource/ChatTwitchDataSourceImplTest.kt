@@ -76,12 +76,18 @@ class ChatTwitchDataSourceImplTest {
             displayName = channel,
             timestamp = Instant.fromEpochMilliseconds(1234567890),
             message = "Hello, World!",
-            source = "Twitch",
+            source = SourceEnum.TWITCH,
             channelId = "789",
             channelName = channel,
-            emotes = listOf(EmoteRemoteEntity(emoteId = "25", positions = listOf(
-                EmotePositionRemoteEntity(0,4)
-            )))
+            emotes = listOf(
+                EmoteRemoteEntity(
+                    emoteId = "25",
+                    imgUrl = "",
+                    positions = listOf(
+                        EmotePositionRemoteEntity(0,4)
+                    )
+                )
+            )
         )
         val user = UserEntity(
             id = "",
