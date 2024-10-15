@@ -10,6 +10,8 @@ import com.google.android.gms.common.api.ApiException
 import com.js.project.data.repository.TokenRepository
 import com.js.project.data.repository.UserRepository
 import com.js.project.domain.entity.UserEntity
+import com.js.project.ext.error
+import com.js.project.ext.info
 import com.js.project.provider.KeysConfig
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -40,11 +42,7 @@ actual class AuthTwitchUseCase(
 
         var user: UserEntity? = null
 
-        Logger.i(
-            tag = "AuthTwitchUseCase", Throwable(authorizationCode)
-        ) {
-            "getUser -> authorizationCode: $authorizationCode"
-        }
+        Logger.info(tag = "AuthTwitchUseCase", "getUser -> authorizationCode: $authorizationCode")
 
         try {
             val tokenResponse = tokenRepository.fetchToken(
@@ -61,26 +59,21 @@ actual class AuthTwitchUseCase(
                 KeysConfig.twitchClientId
             ).last()
 
-            Logger.i(
-                tag = "AuthTwitchUseCase", Throwable(user.toString())
-            ) {
-                "getUser -> user: $user"
-            }
+            Logger.info(
+                tag = "AuthTwitchUseCase",
+                message = "getUser -> user: $user"
+            )
 
             TWITCH_TOKEN = tokenResponse.accessToken
 
-            Logger.i(
-                tag = "AuthTwitchUseCase", Throwable(TWITCH_TOKEN)
-            ) {
-                "getUser -> TWITCH_TOKEN: $TWITCH_TOKEN"
-            }
+            Logger.info("AuthTwitchUseCase","getUser -> TWITCH_TOKEN: $TWITCH_TOKEN")
 
         } catch (e: ApiException) {
-            Logger.e(
-                tag = "AuthTwitchUseCase", e
-            ) {
-                "getUser: $e"
-            }
+            Logger.error(
+                tag = "AuthTwitchUseCase",
+                throwable = e,
+                message = "getUser: $e"
+            )
         }
 
         user?.let {

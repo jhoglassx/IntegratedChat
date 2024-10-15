@@ -9,6 +9,7 @@ import com.js.project.data.entity.ChatMessageEntityRemote
 import com.js.project.data.entity.EmotePositionRemoteEntity
 import com.js.project.data.entity.EmoteRemoteEntity
 import com.js.project.data.entity.UserResponseRemoteEntity
+import com.js.project.ext.error
 import com.js.project.ext.parseDateTime
 import com.js.project.provider.DispatcherProvider
 import com.js.project.service.ApiService
@@ -100,20 +101,20 @@ class ChatYoutubeDataSourceImpl(
                             )
                         }
                     } else {
-                        Logger.e(
-                            tag = "ChatYoutubeDataSourceImpl", Throwable(response.toString())
-                        ) {
-                            "getYouTubeChat ${response.status} - ${response.content}"
-                        }
+                        Logger.error(
+                            tag = "ChatYoutubeDataSourceImpl",
+                            throwable = Throwable(response.toString()),
+                            message ="getYouTubeChat ${response.status} - ${response.content}"
+                        )
                     }
                     delay(5000)
                 }
             } catch (e: Exception) {
-                Logger.e(
-                    tag = "ChatYoutubeDataSourceImpl", e
-                ) {
-                    "getYouTubeChat: ${e.message}"
-                }
+                Logger.error(
+                    tag = "ChatYoutubeDataSourceImpl",
+                    throwable = e,
+                    message = "getYouTubeChat: ${e.message}"
+                )
             }
     }.flowOn(dispatcherProvider.IO)
 
@@ -147,21 +148,21 @@ class ChatYoutubeDataSourceImpl(
                         break
                     }
                 } else {
-                    Logger.e(
-                        tag = "ChatYoutubeDataSourceImpl", Throwable(response.toString())
-                    ) {
-                        "isLiveStreamActive: ${response.status} - ${response.content}"
-                    }
+                    Logger.error(
+                        tag = "ChatYoutubeDataSourceImpl",
+                        throwable = Throwable(response.toString()),
+                        message = "isLiveStreamActive: ${response.status} - ${response.content}"
+                    )
                     emit(false)
                 }
                 delay(5000)
             }
         } catch (e: Exception) {
-            Logger.e(
-                tag = "ChatYoutubeDataSourceImpl", e
-            ) {
-                "isLiveStreamActive: ${e.message}"
-            }
+            Logger.error(
+                tag = "ChatYoutubeDataSourceImpl",
+                throwable = e,
+                message = "isLiveStreamActive: ${e.message}"
+            )
             emit(false)
         }
     }.flowOn(dispatcherProvider.IO)

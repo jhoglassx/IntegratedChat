@@ -3,6 +3,8 @@ package com.js.project.ui.auth
 import co.touchlab.kermit.Logger
 import com.js.project.domain.usecase.AuthGoogleUseCase
 import com.js.project.domain.usecase.AuthTwitchUseCase
+import com.js.project.ext.error
+import com.js.project.ext.info
 import com.js.project.provider.DispatcherProvider
 import com.js.project.ui.auth.model.AuthAction
 import com.js.project.ui.auth.model.AuthState
@@ -42,12 +44,12 @@ class AuthViewModel(
                         authGoogleIntent = intent
                     )
                 }
-            } catch (e: Exception){
-                Logger.e(
-                    tag = "AuthViewModel", e
-                ) {
-                    "googleSignIn: $e"
-                }
+            } catch (e: Exception) {
+                Logger.error(
+                    tag = "AuthViewModel",
+                    throwable = e,
+                    message = "googleSignIn: $e"
+                )
             }
         }
     }
@@ -64,18 +66,14 @@ class AuthViewModel(
                                  userGoggle = user
                              )
                          }
-                         Logger.i(
-                             tag = "AuthViewModel", Throwable(user.toString())
-                         ) {
-                             "getGoogleUser -> user: $user"
-                         }
+                         Logger.info("AuthViewModel","getGoogleUser -> user: $user")
                      }
                 } catch (e: Exception){
-                    Logger.e(
-                        tag = "AuthViewModel", e
-                    ) {
-                        "getGoogleUser: $e"
-                    }
+                    Logger.error(
+                        tag = "AuthViewModel",
+                        throwable = e,
+                        message = "getGoogleUser: $e"
+                    )
                 }
             }
         }
@@ -91,11 +89,11 @@ class AuthViewModel(
                     )
                 }
             } catch (e: Exception){
-                Logger.e(
-                    tag = "AuthViewModel", e
-                ) {
-                    "twitchSignIn: $e"
-                }
+                Logger.error(
+                    tag = "AuthViewModel",
+                    throwable = e,
+                    message = "twitchSignIn: $e"
+                )
             }
         }
     }
@@ -110,18 +108,14 @@ class AuthViewModel(
                                 userTwitch = user
                             )
                         }
-                        Logger.i(
-                            tag = "AuthViewModel", Throwable(user.toString())
-                        ) {
-                            "getTwitchUser -> user: $user"
-                        }
+                        Logger.info("AuthViewModel","getTwitchUser -> user: $user")
                     }
                 } catch (e: Exception) {
-                    Logger.e(
-                        tag = "AuthViewModel", e
-                    ) {
-                        "getTwitchUser: $e"
-                    }
+                    Logger.error(
+                        tag = "AuthViewModel",
+                        throwable = e,
+                        message = "getTwitchUser: $e"
+                    )
                 }
             }
         }

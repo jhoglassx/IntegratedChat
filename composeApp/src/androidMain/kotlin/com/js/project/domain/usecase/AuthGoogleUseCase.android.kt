@@ -7,6 +7,7 @@ import Constants.GOOGLE_TOKEN_URL
 import Constants.GOOGLE_USER_URL
 import android.content.Context
 import android.util.Log
+import co.touchlab.kermit.Logger
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -14,6 +15,7 @@ import com.google.android.gms.common.api.Scope
 import com.js.project.data.repository.TokenRepository
 import com.js.project.data.repository.UserRepository
 import com.js.project.domain.entity.UserEntity
+import com.js.project.ext.info
 import com.js.project.provider.KeysConfig
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -29,7 +31,7 @@ actual class AuthGoogleUseCase(
         val googleSignInOptions = getGoogleSignInOptions()
         val googleSignInClient = GoogleSignIn.getClient(context, googleSignInOptions)
         val signInIntent = googleSignInClient.signInIntent
-        Log.e("AuthClientUseCaseImpl","loginWithGoogle Success: %s $signInIntent")
+        Logger.info("AuthClientUseCaseImpl","loginWithGoogle Success: %s $signInIntent")
         return signInIntent
     }
 

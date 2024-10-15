@@ -17,6 +17,8 @@ import androidx.lifecycle.lifecycleScope
 import co.touchlab.kermit.Logger
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
+import com.js.project.ext.error
+import com.js.project.ext.info
 import com.js.project.provider.DispatcherProvider
 import com.js.project.service.ServerService
 import com.js.project.ui.app.App
@@ -106,18 +108,16 @@ class MainActivity : ComponentActivity() {
             if (code != null) {
                 authViewModel.onAction(AuthAction.GetTwitchUser(code))
 
-                Logger.i(
-                    tag = "MainActivity", Throwable(code.toString())
-                ) {
+                Logger.info(
+                    "MainActivity",
                     "handleServerTwitch -> Authorization code received: $code"
-                }
+                )
 
             } else {
-                Logger.e(
-                    tag = "MainActivity", Throwable()
-                ) {
-                    "handleServerTwitch -> handleServerTwitch: Authorization code not found"
-                }
+                Logger.error(
+                    tag = "MainActivity",
+                    message = "handleServerTwitch -> handleServerTwitch: Authorization code not found"
+                )
             }
             authManager.server(8080){}.stop(1000, 10000)
         }
@@ -125,7 +125,7 @@ class MainActivity : ComponentActivity() {
 }
 
 
-@Preview(device = "id:Nexus 10")
+@Preview
 @Composable
 fun AppAndroidPreview() {
     //App(userInfo, { signIn() }) { signOut() }
