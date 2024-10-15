@@ -25,7 +25,6 @@ kotlin {
 
     sourceSets {
         val commonMain by getting {
-            //resources.srcDirs("src/commonMain/composeResources")
             kotlin.srcDir("${project.rootDir}/buildConfig")
             dependencies {
                 // Compose
@@ -76,6 +75,8 @@ kotlin {
                 implementation(libs.coil.mp)
                 implementation(libs.coil.network.ktor)
 
+                //Logger
+                implementation (libs.napier)
             }
         }
 

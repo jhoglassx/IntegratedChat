@@ -1,5 +1,6 @@
 package com.js.project.domain.usecase
 
+import com.js.project.data.datasource.SourceEnum
 import com.js.project.data.repository.ChatYouTubeLiveIdRepository
 import com.js.project.data.repository.ChatYoutubeRepository
 import com.js.project.domain.entity.ChatMessageEntity
@@ -55,7 +56,7 @@ class ChatYoutubeUseCaseImplTest {
             id = "",
             message = "testMessage",
             displayName = "",
-            source = "",
+            source = SourceEnum.YOUTUBE,
             timestamp = "2024-09-11T16:01:11.042Z".toInstant()
         )
         val liveChatId = "liveChatId"
@@ -129,7 +130,7 @@ class ChatYoutubeUseCaseImplTest {
             id = "",
             message = "testMessage",
             displayName = "",
-            source = "",
+            source = SourceEnum.TWITCH,
             timestamp = "2024-09-11T16:01:11.042Z".toInstant()
         )
         val liveChatId = "liveChatId"

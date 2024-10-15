@@ -1,5 +1,6 @@
 package com.js.project.data.entity
 
+import com.js.project.data.datasource.SourceEnum
 import com.js.project.domain.entity.BadgeEntity
 import com.js.project.domain.entity.ChatMessageEntity
 import kotlinx.datetime.Instant
@@ -17,7 +18,7 @@ data class ChatMessageEntityRemote(
     val message: String = "",
     val badges: List<BadgeResponse>? = listOf(),
     val emotes: List<EmoteRemoteEntity>? = listOf(),
-    val source: String = "Twitch",
+    val source: SourceEnum,
     val channelId: String? = null,
     val channelName: String? = null
 )

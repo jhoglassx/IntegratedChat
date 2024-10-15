@@ -1,5 +1,6 @@
 package com.js.project.domain.entity
 
+import com.js.project.data.datasource.SourceEnum
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
@@ -15,7 +16,7 @@ data class ChatMessageEntity(
     val message: String = "",
     val badges: List<BadgeEntity>? = null,
     val emotes: List<EmoteEntity>? = null,
-    val source: String = "Twitch",
+    val source: SourceEnum,
     val channelId: String? = null,
     val channelName: String? = null
 )

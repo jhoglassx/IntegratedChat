@@ -6,6 +6,7 @@ import com.js.project.provider.DispatcherProvider
 import com.js.project.ui.auth.model.AuthAction
 import com.js.project.ui.auth.model.AuthState
 import com.js.project.ui.base.BaseViewModel
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -42,7 +43,7 @@ class AuthViewModel(
                     )
                 }
             } catch (e: Exception){
-                val error = e
+                Napier.e("AuthViewModel -> googleSignIn: $e")
             }
         }
     }
@@ -59,11 +60,10 @@ class AuthViewModel(
                                  userGoggle = user
                              )
                          }
+                         Napier.i("AuthViewModel -> getGoogleUser -> user: $user")
                      }
                 } catch (e: Exception){
-                    _uiState.value = _uiState.value.copy(
-                         //error = e.message ?: "Unknown error"
-                    )
+                    Napier.e("AuthViewModel -> getGoogleUser: $e")
                 }
             }
         }
@@ -71,11 +71,15 @@ class AuthViewModel(
 
     private fun twitchSignIn(){
         viewModelScope.launch {
-            val intent = authTwitchUseCase.signIn()
-            _uiState.update {
-                it.copy(
-                    authTwitchIntent = intent
-                )
+            try {
+                val intent = authTwitchUseCase.signIn()
+                _uiState.update {
+                    it.copy(
+                        authTwitchIntent = intent
+                    )
+                }
+            } catch (e: Exception){
+                Napier.e("AuthViewModel -> twitchSignIn: $e")
             }
         }
     }
@@ -90,11 +94,10 @@ class AuthViewModel(
                                 userTwitch = user
                             )
                         }
+                        Napier.i("AuthViewModel -> getTwitchUser -> user: $user")
                     }
                 } catch (e: Exception) {
-                    _uiState.value = _uiState.value.copy(
-                        //error = e.message ?: "Unknown error"
-                    )
+                    Napier.e("AuthViewModel -> getTwitchUser: $e")
                 }
             }
         }
