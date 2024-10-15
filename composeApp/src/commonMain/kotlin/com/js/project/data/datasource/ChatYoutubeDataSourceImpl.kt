@@ -3,6 +3,7 @@ package com.js.project.data.datasource
 import Constants.EMOTE_REGEX
 import Constants.GOOGLE_LIVE_CHAT_ID
 import Constants.GOOGLE_TOKEN
+import co.touchlab.kermit.Logger
 import com.js.project.data.entity.BadgeResponse
 import com.js.project.data.entity.ChatMessageEntityRemote
 import com.js.project.data.entity.EmotePositionRemoteEntity
@@ -11,7 +12,6 @@ import com.js.project.data.entity.UserResponseRemoteEntity
 import com.js.project.ext.parseDateTime
 import com.js.project.provider.DispatcherProvider
 import com.js.project.service.ApiService
-import io.github.aakira.napier.Napier
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpMethod
@@ -49,7 +49,7 @@ class ChatYoutubeDataSourceImpl(
                             "Authorization" to "Bearer $GOOGLE_TOKEN",
                         ),
                         queryParams = mapOf(
-                            "liveChatId" to GOOGLE_LIVE_CHAT_ID.toString(),
+                            "liveChatId" to GOOGLE_LIVE_CHAT_ID,
                             "part" to "snippet,authorDetails",
                             "pageToken" to nextPageToken
                         )
@@ -100,12 +100,20 @@ class ChatYoutubeDataSourceImpl(
                             )
                         }
                     } else {
-                        Napier.e("ChatYoutubeDataSourceImpl -> getYouTubeChat -> Error: ${response.status} - ${response.content}")
+                        Logger.e(
+                            tag = "ChatYoutubeDataSourceImpl", Throwable(response.toString())
+                        ) {
+                            "getYouTubeChat ${response.status} - ${response.content}"
+                        }
                     }
                     delay(5000)
                 }
             } catch (e: Exception) {
-                Napier.e("ChatYoutubeDataSourceImpl -> getYouTubeChat: ${e.message}")
+                Logger.e(
+                    tag = "ChatYoutubeDataSourceImpl", e
+                ) {
+                    "getYouTubeChat: ${e.message}"
+                }
             }
     }.flowOn(dispatcherProvider.IO)
 
@@ -139,13 +147,21 @@ class ChatYoutubeDataSourceImpl(
                         break
                     }
                 } else {
-                    Napier.e("ChatYoutubeDataSourceImpl -> isLiveStreamActive -> Error: ${response.status} - ${response.content}")
+                    Logger.e(
+                        tag = "ChatYoutubeDataSourceImpl", Throwable(response.toString())
+                    ) {
+                        "isLiveStreamActive: ${response.status} - ${response.content}"
+                    }
                     emit(false)
                 }
                 delay(5000)
             }
         } catch (e: Exception) {
-            Napier.e("ChatYoutubeDataSourceImpl -> isLiveStreamActive: ${e.message}")
+            Logger.e(
+                tag = "ChatYoutubeDataSourceImpl", e
+            ) {
+                "isLiveStreamActive: ${e.message}"
+            }
             emit(false)
         }
     }.flowOn(dispatcherProvider.IO)

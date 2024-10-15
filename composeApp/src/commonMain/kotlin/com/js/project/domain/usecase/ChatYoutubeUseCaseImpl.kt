@@ -22,7 +22,7 @@ class ChatYoutubeUseCaseImpl(
             GOOGLE_LIVE_CHAT_ID =
                 chatYouTubeLiveIdRepository.getYouTubeLiveChatId(googleUser.id).last()
 
-            if (GOOGLE_LIVE_CHAT_ID.isNullOrEmpty().not()) {
+            if (GOOGLE_LIVE_CHAT_ID.isEmpty().not()) {
                 chatYoutubeRepository.getYouTubeChat(googleUser).collect {
                     emit(it)
                 }

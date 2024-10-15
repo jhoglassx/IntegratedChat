@@ -76,7 +76,7 @@ kotlin {
                 implementation(libs.coil.network.ktor)
 
                 //Logger
-                implementation (libs.napier)
+                implementation(libs.kermit)
             }
         }
 

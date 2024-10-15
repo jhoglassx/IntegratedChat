@@ -1,12 +1,12 @@
 package com.js.project.ui.auth
 
+import co.touchlab.kermit.Logger
 import com.js.project.domain.usecase.AuthGoogleUseCase
 import com.js.project.domain.usecase.AuthTwitchUseCase
 import com.js.project.provider.DispatcherProvider
 import com.js.project.ui.auth.model.AuthAction
 import com.js.project.ui.auth.model.AuthState
 import com.js.project.ui.base.BaseViewModel
-import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -43,7 +43,11 @@ class AuthViewModel(
                     )
                 }
             } catch (e: Exception){
-                Napier.e("AuthViewModel -> googleSignIn: $e")
+                Logger.e(
+                    tag = "AuthViewModel", e
+                ) {
+                    "googleSignIn: $e"
+                }
             }
         }
     }
@@ -60,10 +64,18 @@ class AuthViewModel(
                                  userGoggle = user
                              )
                          }
-                         Napier.i("AuthViewModel -> getGoogleUser -> user: $user")
+                         Logger.i(
+                             tag = "AuthViewModel", Throwable(user.toString())
+                         ) {
+                             "getGoogleUser -> user: $user"
+                         }
                      }
                 } catch (e: Exception){
-                    Napier.e("AuthViewModel -> getGoogleUser: $e")
+                    Logger.e(
+                        tag = "AuthViewModel", e
+                    ) {
+                        "getGoogleUser: $e"
+                    }
                 }
             }
         }
@@ -79,7 +91,11 @@ class AuthViewModel(
                     )
                 }
             } catch (e: Exception){
-                Napier.e("AuthViewModel -> twitchSignIn: $e")
+                Logger.e(
+                    tag = "AuthViewModel", e
+                ) {
+                    "twitchSignIn: $e"
+                }
             }
         }
     }
@@ -94,10 +110,18 @@ class AuthViewModel(
                                 userTwitch = user
                             )
                         }
-                        Napier.i("AuthViewModel -> getTwitchUser -> user: $user")
+                        Logger.i(
+                            tag = "AuthViewModel", Throwable(user.toString())
+                        ) {
+                            "getTwitchUser -> user: $user"
+                        }
                     }
                 } catch (e: Exception) {
-                    Napier.e("AuthViewModel -> getTwitchUser: $e")
+                    Logger.e(
+                        tag = "AuthViewModel", e
+                    ) {
+                        "getTwitchUser: $e"
+                    }
                 }
             }
         }
