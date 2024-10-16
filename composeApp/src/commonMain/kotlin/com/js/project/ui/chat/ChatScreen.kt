@@ -1,14 +1,14 @@
 package com.js.project.ui.chat
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation.Vertical
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,8 +21,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -34,10 +34,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import coil3.compose.AsyncImage
 import com.js.project.data.datasource.SourceEnum
 import com.js.project.domain.entity.ChatMessageEntity
@@ -46,6 +47,7 @@ import com.js.project.ui.auth.model.AuthState
 import com.js.project.ui.chat.model.ChatAction
 import com.js.project.ui.chat.model.ChatState
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 
@@ -100,7 +102,7 @@ fun ChatMessage(
             .fillMaxSize()
             .padding(innerPadding),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(modifier = Modifier.weight(1f)) {
             LazyColumn(
@@ -134,61 +136,170 @@ fun ChatMessage(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ChatMessageItem(
     chatMessage: ChatMessageEntity
 ) {
     Box(
         modifier = Modifier
-            .background(chatMessage.source.color)
-            .fillMaxSize()
-            .padding(start = 8.dp)
+            .fillMaxWidth()
     ) {
-        FlowRow(
+        Icon(
+            painter = painterResource(chatMessage.source.icon),
+            contentDescription = chatMessage.source.description,
+            tint = chatMessage.source.color.copy(alpha = 0.3f),
+            modifier = Modifier
+                .padding(vertical = 2.dp, horizontal = 10.dp)
+                .height(48.dp)
+                .align(Alignment.TopEnd)
+                .zIndex(1f)
+        )
+
+        Column (
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.LightGray)
-                .padding(4.dp)
+                .background(chatMessage.source.color)
+                .padding(start = 8.dp)
         ) {
-            chatMessage.badges?.forEach { badge ->
-                AsyncImage(
-                    model = badge.url,
-                    contentDescription = null,
-                    modifier = Modifier.padding(4.dp),
-                    contentScale = ContentScale.Crop,
+            Row(
+                modifier = Modifier
+                    .background(Color.DarkGray)
+                    .padding(4.dp)
+                    .fillMaxWidth()
+            ) {
+                chatMessage.badges?.forEach { badge ->
+                    AsyncImage(
+                        model = badge.url,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(16.dp)
+                            .background(Color.Transparent),
+                        contentScale = ContentScale.Crop,
+                    )
+                }
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = chatMessage.displayName,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    lineHeight = 14.sp,
+                    color = Color.White
+                )
+
+                Spacer(modifier = Modifier.width(4.dp))
+
+                Text(
+                    text = ":",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    lineHeight = 14.sp,
+                    color = Color.White
                 )
             }
-            Text(
-                text = chatMessage.displayName,
-                style = MaterialTheme.typography.body1.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 10.sp
-                )
-            )
-            ChatMessageView(chatMessage)
+
+            Row(
+                modifier = Modifier
+                    .background(Color.DarkGray)
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp, horizontal = 8.dp)
+            ) {
+                ChatMessageView(chatMessage)
+            }
         }
     }
-}
 
+
+}
 @Composable
-fun ChatMessageView(chatMessage: ChatMessageEntity) {
+fun ChatMessageView(
+    chatMessage: ChatMessageEntity
+) {
     val processedMessage = chatMessage.processMessage()
     processedMessage.forEach { part ->
-        part.text?.let {
+        part.text?.let { text ->
             Text(
-                text = it,
-                overflow = TextOverflow.Clip,
-                style = MaterialTheme.typography.body1
+                text = text,
+                fontSize = 14.sp,
+                color = Color.White,
+                modifier = Modifier
+                    .padding(end = 2.dp)
             )
         }
         part.imageUrl?.let { imageUrl ->
             AsyncImage(
                 model = imageUrl,
                 contentDescription = null,
-                modifier = Modifier.size(26.dp),
+                modifier = Modifier
+                    .size(26.dp)
+                    .background(Color.Transparent),
                 contentScale = ContentScale.Crop,
             )
+        }
+    }
+}
+@Composable
+fun ChatMessageView2(
+    chatMessage: ChatMessageEntity
+) {
+    val processedMessage = chatMessage.processMessage()
+    Column(
+        modifier = Modifier
+            .testTag("chatMessageContainer")
+            .background(Color.LightGray)
+            .fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .testTag("chatDetails")
+                .fillMaxHeight(),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            chatMessage.badges?.forEach { badge ->
+                AsyncImage(
+                    model = badge.url,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    contentScale = ContentScale.Crop,
+                )
+            }
+            Spacer(modifier = Modifier.padding(2.dp).fillMaxHeight())
+            Text(
+                text = chatMessage.displayName,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 12.sp,
+                fontSize = 12.sp,
+            )
+            Text(
+                text = ":",
+                fontWeight = FontWeight.Bold,
+                lineHeight = 12.sp,
+                fontSize = 12.sp,
+            )
+            Spacer(modifier = Modifier.padding(2.dp).fillMaxHeight())
+        }
+        Row(
+            modifier = Modifier
+                .testTag("chatMessage")
+                .fillMaxWidth()
+        ) {
+            processedMessage.forEach { part ->
+                part.text?.let { text ->
+                    Text(
+                        text = text,
+                        fontSize = 12.sp,
+                        lineHeight = 16.sp,
+                    )
+                }
+                part.imageUrl?.let { imageUrl ->
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = null,
+                        modifier = Modifier.size(26.dp),
+                        contentScale = ContentScale.Crop,
+                    )
+                }
+            }
         }
     }
 }
