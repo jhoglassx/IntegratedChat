@@ -24,8 +24,13 @@ kotlin {
     jvm("desktop")
 
     sourceSets {
+        all {
+            languageSettings {
+                optIn("kotlin.ExperimentalMultiplatform")
+            }
+        }
+
         val commonMain by getting {
-            //resources.srcDirs("src/commonMain/composeResources")
             kotlin.srcDir("${project.rootDir}/buildConfig")
             dependencies {
                 // Compose
@@ -36,11 +41,12 @@ kotlin {
                 implementation(compose.ui)
                 implementation(compose.material3)
                 implementation(compose.components.resources)
-                implementation(compose.components.uiToolingPreview)
+
+                implementation(compose.uiTooling)
+                implementation(compose.preview)
 
                 // Lifecycle
                 implementation(libs.lifecycle.viewmodel)
-                //implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
 
                 // Serialization
                 implementation(libs.kotlinx.serialization.core)
@@ -76,6 +82,8 @@ kotlin {
                 implementation(libs.coil.mp)
                 implementation(libs.coil.network.ktor)
 
+                //Logger
+                implementation(libs.kermit)
             }
         }
 
@@ -94,6 +102,7 @@ kotlin {
                 // Compose
                 implementation(compose.ui)
                 implementation(compose.material)
+                implementation(compose.uiTooling)
                 implementation(compose.preview)
                 implementation(libs.androidx.material3)
 
@@ -140,6 +149,7 @@ kotlin {
             dependencies {
                 // Compose
                 implementation(compose.desktop.currentOs)
+                implementation(compose.preview)
 
                 // Coroutines
                 implementation(libs.kotlinx.coroutines.swing)
@@ -226,6 +236,12 @@ compose.desktop {
             packageName = "com.js.project"
             packageVersion = "1.0.0"
         }
+    }
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions {
+        freeCompilerArgs = listOf("-Xexpect-actual-classes")
     }
 }
 

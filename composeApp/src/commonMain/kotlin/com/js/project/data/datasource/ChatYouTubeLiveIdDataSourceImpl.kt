@@ -1,6 +1,8 @@
 package com.js.project.data.datasource
 
 import Constants.GOOGLE_TOKEN
+import co.touchlab.kermit.Logger
+import com.js.project.ext.error
 import com.js.project.provider.DispatcherProvider
 import com.js.project.service.ApiService
 import io.ktor.client.statement.HttpResponse
@@ -55,7 +57,13 @@ class ChatYouTubeLiveIdDataSourceImpl(
 
             emit(liveChatId)
         } else {
-            throw Exception("Failed to fetch live chat ID: ${response.status}")
+            val error = Exception("Failed to fetch live chat ID: $response")
+            Logger.error(
+                tag = "ChatYoutubeDataSourceImpl",
+                throwable = error,
+                message = "isLiveStreamActive: $error"
+            )
+            throw error
         }
     }.flowOn(dispatcherProvider.IO)
 }

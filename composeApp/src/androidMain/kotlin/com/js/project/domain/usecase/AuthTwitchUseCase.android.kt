@@ -5,10 +5,13 @@ import Constants.TWITCH_SCOPES
 import Constants.TWITCH_TOKEN
 import Constants.TWITCH_TOKEN_URL
 import Constants.TWITCH_USER_INFO_URL
+import co.touchlab.kermit.Logger
 import com.google.android.gms.common.api.ApiException
 import com.js.project.data.repository.TokenRepository
 import com.js.project.data.repository.UserRepository
 import com.js.project.domain.entity.UserEntity
+import com.js.project.ext.error
+import com.js.project.ext.info
 import com.js.project.provider.KeysConfig
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -39,6 +42,8 @@ actual class AuthTwitchUseCase(
 
         var user: UserEntity? = null
 
+        Logger.info(tag = "AuthTwitchUseCase", "getUser -> authorizationCode: $authorizationCode")
+
         try {
             val tokenResponse = tokenRepository.fetchToken(
                 TWITCH_TOKEN_URL,
@@ -54,10 +59,21 @@ actual class AuthTwitchUseCase(
                 KeysConfig.twitchClientId
             ).last()
 
+            Logger.info(
+                tag = "AuthTwitchUseCase",
+                message = "getUser -> user: $user"
+            )
+
             TWITCH_TOKEN = tokenResponse.accessToken
 
-        } catch (e: ApiException) {
+            Logger.info("AuthTwitchUseCase","getUser -> TWITCH_TOKEN: $TWITCH_TOKEN")
 
+        } catch (e: ApiException) {
+            Logger.error(
+                tag = "AuthTwitchUseCase",
+                throwable = e,
+                message = "getUser: $e"
+            )
         }
 
         user?.let {

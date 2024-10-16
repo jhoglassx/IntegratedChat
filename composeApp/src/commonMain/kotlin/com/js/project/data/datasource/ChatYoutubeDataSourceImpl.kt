@@ -1,10 +1,15 @@
 package com.js.project.data.datasource
 
+import Constants.EMOTE_REGEX
 import Constants.GOOGLE_LIVE_CHAT_ID
 import Constants.GOOGLE_TOKEN
+import co.touchlab.kermit.Logger
 import com.js.project.data.entity.BadgeResponse
 import com.js.project.data.entity.ChatMessageEntityRemote
+import com.js.project.data.entity.EmotePositionRemoteEntity
+import com.js.project.data.entity.EmoteRemoteEntity
 import com.js.project.data.entity.UserResponseRemoteEntity
+import com.js.project.ext.error
 import com.js.project.ext.parseDateTime
 import com.js.project.provider.DispatcherProvider
 import com.js.project.service.ApiService
@@ -45,14 +50,13 @@ class ChatYoutubeDataSourceImpl(
                             "Authorization" to "Bearer $GOOGLE_TOKEN",
                         ),
                         queryParams = mapOf(
-                            "liveChatId" to GOOGLE_LIVE_CHAT_ID.toString(),
+                            "liveChatId" to GOOGLE_LIVE_CHAT_ID,
                             "part" to "snippet,authorDetails",
                             "pageToken" to nextPageToken
                         )
                     )
 
-                    if (response.status == HttpStatusCode.OK) {
-                        val responseBody = response.bodyAsText()
+                    if (response.status == HttpStatusCode.OK) {val responseBody = response.bodyAsText()
                         val json = Json.parseToJsonElement(responseBody).jsonObject
                         val items = json["items"]?.jsonArray ?: emptyList()
                         nextPageToken = json["nextPageToken"]?.jsonPrimitive?.contentOrNull ?: ""
@@ -78,6 +82,7 @@ class ChatYoutubeDataSourceImpl(
 
                             // Determine badges
                             val badges = listOf<BadgeResponse>()
+                            val emotes = parseEmotes(displayMessage)
 
                             emit(
                                 ChatMessageEntityRemote(
@@ -88,21 +93,28 @@ class ChatYoutubeDataSourceImpl(
                                     timestamp = timestamp,
                                     message = displayMessage,
                                     badges = badges,
-                                    source = "YouTube",
+                                    emotes = emotes,
+                                    source = SourceEnum.YOUTUBE,
                                     channelId = channelId,
                                     channelName = channelName
                                 )
                             )
                         }
                     } else {
-                        // Handle non-OK response
-                        println("Error: ChatYoutubeDataSourceImpl -> getYouTubeChat: ${response.status} - ${response.content}")
+                        Logger.error(
+                            tag = "ChatYoutubeDataSourceImpl",
+                            throwable = Throwable(response.toString()),
+                            message ="getYouTubeChat ${response.status} - ${response.content}"
+                        )
                     }
                     delay(5000)
                 }
             } catch (e: Exception) {
-                // Handle exceptions
-                println("Exception: ChatYoutubeDataSourceImpl -> getYouTubeChat: ${e.message}")
+                Logger.error(
+                    tag = "ChatYoutubeDataSourceImpl",
+                    throwable = e,
+                    message = "getYouTubeChat: ${e.message}"
+                )
             }
     }.flowOn(dispatcherProvider.IO)
 
@@ -119,7 +131,7 @@ class ChatYoutubeDataSourceImpl(
                         "Authorization" to "Bearer $GOOGLE_TOKEN",
                     ),
                     queryParams = mapOf(
-                        "liveChatId" to GOOGLE_LIVE_CHAT_ID.toString(),
+                        "liveChatId" to GOOGLE_LIVE_CHAT_ID,
                         "part" to "status",
                         "broadcastStatus" to "active",
                         "broadcastType" to "all",
@@ -136,15 +148,44 @@ class ChatYoutubeDataSourceImpl(
                         break
                     }
                 } else {
-                    println("Error: ChatYoutubeDataSourceImpl -> isLiveStreamActive: ${response.status} - ${response.content}")
+                    Logger.error(
+                        tag = "ChatYoutubeDataSourceImpl",
+                        throwable = Throwable(response.toString()),
+                        message = "isLiveStreamActive: ${response.status} - ${response.content}"
+                    )
                     emit(false)
                 }
                 delay(5000)
             }
         } catch (e: Exception) {
-            println("Exception: ChatYoutubeDataSourceImpl -> isLiveStreamActive: ${e.message}")
+            Logger.error(
+                tag = "ChatYoutubeDataSourceImpl",
+                throwable = e,
+                message = "isLiveStreamActive: ${e.message}"
+            )
             emit(false)
         }
     }.flowOn(dispatcherProvider.IO)
+
+    private fun parseEmotes(displayMessage: String): List<EmoteRemoteEntity> {
+        val emotes = mutableListOf<EmoteRemoteEntity>()
+        val matches = EMOTE_REGEX.findAll(displayMessage)
+
+        matches.forEach { match ->
+            val id = match.value
+            val start = match.range.first
+            val end = match.range.last + 1
+
+            emotes.add(
+                EmoteRemoteEntity(
+                    emoteId = id,
+                    imgUrl = EmoteUrlEnum.fromLabel(id).url ,
+                    positions = listOf(EmotePositionRemoteEntity(start, end))
+                )
+            )
+        }
+
+        return emotes
+    }
 }
 

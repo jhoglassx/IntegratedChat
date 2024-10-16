@@ -1,5 +1,6 @@
 package com.js.project.domain.usecase
 
+import com.js.project.data.datasource.SourceEnum
 import com.js.project.data.repository.ChatTwitchRepository
 import com.js.project.domain.entity.ChatMessageEntity
 import com.js.project.domain.entity.UserEntity
@@ -51,7 +52,7 @@ class ChatTwitchUseCaseImplTest {
             id = "",
             message = "testMessage",
             displayName = "",
-            source = "",
+            source = SourceEnum.TWITCH,
             timestamp = "2024-09-11T16:01:11.042Z".toInstant()
         )
 

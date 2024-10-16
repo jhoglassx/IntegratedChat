@@ -3,7 +3,6 @@ package com.js.project.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -15,8 +14,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import co.touchlab.kermit.Logger
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
+import com.js.project.ext.error
+import com.js.project.ext.info
 import com.js.project.provider.DispatcherProvider
 import com.js.project.service.ServerService
 import com.js.project.ui.app.App
@@ -105,9 +107,17 @@ class MainActivity : ComponentActivity() {
         authManager.server(8080) { code ->
             if (code != null) {
                 authViewModel.onAction(AuthAction.GetTwitchUser(code))
-                Log.d("AuthCallback", "Authorization code received: $code")
+
+                Logger.info(
+                    "MainActivity",
+                    "handleServerTwitch -> Authorization code received: $code"
+                )
+
             } else {
-                Log.e("AuthCallback", "Authorization code not found")
+                Logger.error(
+                    tag = "MainActivity",
+                    message = "handleServerTwitch -> handleServerTwitch: Authorization code not found"
+                )
             }
             authManager.server(8080){}.stop(1000, 10000)
         }

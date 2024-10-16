@@ -77,6 +77,7 @@ class ChatTwitchDataSourceImpl(
                 }
                 EmoteRemoteEntity(
                     emoteId = emoteId,
+                    imgUrl = "",
                     positions = ranges
                 )
             } else {
@@ -93,7 +94,7 @@ class ChatTwitchDataSourceImpl(
             message = messagePart,
             badges = badges,
             emotes = emotes,
-            source = "Twitch",
+            source = SourceEnum.TWITCH,
             channelId = tags["room-id"],
             channelName = channel
         )

@@ -1,7 +1,10 @@
 package com.js.project.ui.auth
 
+import co.touchlab.kermit.Logger
 import com.js.project.domain.usecase.AuthGoogleUseCase
 import com.js.project.domain.usecase.AuthTwitchUseCase
+import com.js.project.ext.error
+import com.js.project.ext.info
 import com.js.project.provider.DispatcherProvider
 import com.js.project.ui.auth.model.AuthAction
 import com.js.project.ui.auth.model.AuthState
@@ -41,8 +44,12 @@ class AuthViewModel(
                         authGoogleIntent = intent
                     )
                 }
-            } catch (e: Exception){
-                val error = e
+            } catch (e: Exception) {
+                Logger.error(
+                    tag = "AuthViewModel",
+                    throwable = e,
+                    message = "googleSignIn: $e"
+                )
             }
         }
     }
@@ -59,10 +66,13 @@ class AuthViewModel(
                                  userGoggle = user
                              )
                          }
+                         Logger.info("AuthViewModel","getGoogleUser -> user: $user")
                      }
                 } catch (e: Exception){
-                    _uiState.value = _uiState.value.copy(
-                         //error = e.message ?: "Unknown error"
+                    Logger.error(
+                        tag = "AuthViewModel",
+                        throwable = e,
+                        message = "getGoogleUser: $e"
                     )
                 }
             }
@@ -71,10 +81,18 @@ class AuthViewModel(
 
     private fun twitchSignIn(){
         viewModelScope.launch {
-            val intent = authTwitchUseCase.signIn()
-            _uiState.update {
-                it.copy(
-                    authTwitchIntent = intent
+            try {
+                val intent = authTwitchUseCase.signIn()
+                _uiState.update {
+                    it.copy(
+                        authTwitchIntent = intent
+                    )
+                }
+            } catch (e: Exception){
+                Logger.error(
+                    tag = "AuthViewModel",
+                    throwable = e,
+                    message = "twitchSignIn: $e"
                 )
             }
         }
@@ -90,10 +108,13 @@ class AuthViewModel(
                                 userTwitch = user
                             )
                         }
+                        Logger.info("AuthViewModel","getTwitchUser -> user: $user")
                     }
                 } catch (e: Exception) {
-                    _uiState.value = _uiState.value.copy(
-                        //error = e.message ?: "Unknown error"
+                    Logger.error(
+                        tag = "AuthViewModel",
+                        throwable = e,
+                        message = "getTwitchUser: $e"
                     )
                 }
             }
