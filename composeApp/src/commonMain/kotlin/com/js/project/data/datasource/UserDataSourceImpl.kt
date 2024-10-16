@@ -3,7 +3,6 @@ package com.js.project.data.datasource
 import com.js.project.data.entity.UserResponseRemoteEntity
 import com.js.project.provider.DispatcherProvider
 import com.js.project.service.ApiService
-import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpMethod
@@ -70,7 +69,7 @@ class UserDataSourceImpl(
         )
 
         if (response.status == HttpStatusCode.OK) {
-            val responseBody = response.body<String>()
+            val responseBody = response.bodyAsText()
             val json = Json.parseToJsonElement(responseBody).jsonObject
 
             val userData = json["data"]?.jsonArray?.firstOrNull()?.jsonObject

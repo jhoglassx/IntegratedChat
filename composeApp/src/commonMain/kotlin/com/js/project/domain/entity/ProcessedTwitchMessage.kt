@@ -6,11 +6,9 @@ data class ProcessedMessage(
     val imageUrl: String? = null
 )
 
-fun ChatMessageEntity.processTwitchMessage(): List<ProcessedMessage> {
+fun ChatMessageEntity.processMessage(): List<ProcessedMessage> {
     val parts = mutableListOf<ProcessedMessage>()
     var currentIndex = 0
-
-    val semEmojis = message.removeEmojis()
 
     val sortedEmotes = emotes?.flatMap { emote ->
         emote.positions.map { position -> emote to position }
@@ -18,21 +16,15 @@ fun ChatMessageEntity.processTwitchMessage(): List<ProcessedMessage> {
 
     for ((emote, position) in sortedEmotes) {
         if (currentIndex < position.start) {
-            parts.add(ProcessedMessage(text = semEmojis.substring(currentIndex, position.start)))
+            parts.add(ProcessedMessage(text = message.substring(currentIndex, position.start)))
         }
         parts.add(ProcessedMessage(imageUrl = emote.url))
         currentIndex = position.end + 1
     }
 
-    if (currentIndex < semEmojis.length) {
-        parts.add(ProcessedMessage(text = semEmojis.substring(currentIndex)))
+    if (currentIndex < message.length) {
+        parts.add(ProcessedMessage(text = message.substring(currentIndex)))
     }
 
     return parts
-}
-
-fun String.removeEmojis(): String {
-    // Regex pattern to match :nome-do-emoji:
-    val emojiPattern = ":\\w+(-\\w+)*:".toRegex()
-    return this.replace(emojiPattern, "")
 }

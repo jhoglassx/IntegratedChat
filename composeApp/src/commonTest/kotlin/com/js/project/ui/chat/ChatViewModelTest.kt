@@ -1,5 +1,6 @@
 package com.js.project.ui.chat
 
+import com.js.project.data.datasource.SourceEnum
 import com.js.project.domain.entity.ChatMessageEntity
 import com.js.project.domain.entity.UserEntity
 import com.js.project.domain.usecase.ChatTwitchUseCase
@@ -85,14 +86,14 @@ class ChatViewModelTest {
             id = "twitchMessage_id",
             displayName = "twitchMessage_displayName",
             message = "twitchMessage_message",
-            source = "twitchMessage_source",
+            source = SourceEnum.TWITCH,
             timestamp = "2024-09-11T16:01:11.042Z".toInstant()
         )
         val youtubeMessage = ChatMessageEntity(
             id = "youtubeMessage_id",
             displayName = "youtubeMessage_displayName",
             message = "youtubeMessage_message",
-            source = "youtubeMessage_source",
+            source = SourceEnum.YOUTUBE,
             timestamp = "2024-09-11T16:02:11.042Z".toInstant()
         )
 

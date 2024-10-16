@@ -8,7 +8,7 @@ object Constants {
     const val GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
     const val GOOGLE_USER_URL = "https://www.googleapis.com/oauth2/v1/userinfo"
     var GOOGLE_TOKEN = ""
-    var GOOGLE_LIVE_CHAT_ID: String? = null
+    var GOOGLE_LIVE_CHAT_ID: String = ""
 
 
     //TWITCH
@@ -18,4 +18,7 @@ object Constants {
     const val TWITCH_USER_INFO_URL = "https://api.twitch.tv/helix/users"
     val TWITCH_EMOTE_CACHE = ConcurrentHashMap<String, BadgeResponse>()
     var TWITCH_TOKEN = ""
+
+    //EMOTE
+    val EMOTE_REGEX = """:\w+(-\w+)*:""".toRegex()
 }
