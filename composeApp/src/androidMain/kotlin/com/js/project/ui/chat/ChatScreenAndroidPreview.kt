@@ -11,7 +11,7 @@ import com.js.project.ui.chat.model.ChatState
 
 @Preview
 @Composable
-fun ChatMessagePreview(){
+fun ChatMessageAndroidPreview(){
     val chatState = ChatState(
         chatMessages = mutableListOf(
             ChatMessageEntity(

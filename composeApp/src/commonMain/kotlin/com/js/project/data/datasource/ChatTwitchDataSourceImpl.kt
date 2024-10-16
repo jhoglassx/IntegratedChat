@@ -77,7 +77,7 @@ class ChatTwitchDataSourceImpl(
                 }
                 EmoteRemoteEntity(
                     emoteId = emoteId,
-                    imgUrl = "https://static-cdn.jtvnw.net/emoticons/v2/$emoteId/default/dark/1.0",
+                    imgUrl = "",
                     positions = ranges
                 )
             } else {

@@ -6,7 +6,6 @@ import Constants.GOOGLE_TOKEN
 import Constants.GOOGLE_TOKEN_URL
 import Constants.GOOGLE_USER_URL
 import android.content.Context
-import android.util.Log
 import co.touchlab.kermit.Logger
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions

@@ -1,7 +1,6 @@
 package com.js.project.ui.chat
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation.Vertical
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,13 +33,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import coil3.compose.AsyncImage
-import com.js.project.data.datasource.SourceEnum
 import com.js.project.domain.entity.ChatMessageEntity
 import com.js.project.domain.entity.processMessage
 import com.js.project.ui.auth.model.AuthState
@@ -48,7 +45,6 @@ import com.js.project.ui.chat.model.ChatAction
 import com.js.project.ui.chat.model.ChatState
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 
 @Composable
@@ -147,7 +143,7 @@ fun ChatMessageItem(
         Icon(
             painter = painterResource(chatMessage.source.icon),
             contentDescription = chatMessage.source.description,
-            tint = chatMessage.source.color.copy(alpha = 0.3f),
+            tint = Color.White.copy(alpha = 0.3f),
             modifier = Modifier
                 .padding(vertical = 2.dp, horizontal = 10.dp)
                 .height(48.dp)
@@ -236,104 +232,4 @@ fun ChatMessageView(
             )
         }
     }
-}
-@Composable
-fun ChatMessageView2(
-    chatMessage: ChatMessageEntity
-) {
-    val processedMessage = chatMessage.processMessage()
-    Column(
-        modifier = Modifier
-            .testTag("chatMessageContainer")
-            .background(Color.LightGray)
-            .fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier
-                .testTag("chatDetails")
-                .fillMaxHeight(),
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.Start
-        ) {
-            chatMessage.badges?.forEach { badge ->
-                AsyncImage(
-                    model = badge.url,
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp),
-                    contentScale = ContentScale.Crop,
-                )
-            }
-            Spacer(modifier = Modifier.padding(2.dp).fillMaxHeight())
-            Text(
-                text = chatMessage.displayName,
-                fontWeight = FontWeight.Bold,
-                lineHeight = 12.sp,
-                fontSize = 12.sp,
-            )
-            Text(
-                text = ":",
-                fontWeight = FontWeight.Bold,
-                lineHeight = 12.sp,
-                fontSize = 12.sp,
-            )
-            Spacer(modifier = Modifier.padding(2.dp).fillMaxHeight())
-        }
-        Row(
-            modifier = Modifier
-                .testTag("chatMessage")
-                .fillMaxWidth()
-        ) {
-            processedMessage.forEach { part ->
-                part.text?.let { text ->
-                    Text(
-                        text = text,
-                        fontSize = 12.sp,
-                        lineHeight = 16.sp,
-                    )
-                }
-                part.imageUrl?.let { imageUrl ->
-                    AsyncImage(
-                        model = imageUrl,
-                        contentDescription = null,
-                        modifier = Modifier.size(26.dp),
-                        contentScale = ContentScale.Crop,
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Preview
-@Composable
-fun ChatMessagePreview1(){
-    val chatState = ChatState(
-        chatMessages = mutableListOf(
-            ChatMessageEntity(
-                id = "chatMessage_1",
-                userId = "userId_1",
-                userName = "userName_1",
-                displayName = "displayName_1",
-                message = "message_1",
-                source = SourceEnum.TWITCH,
-                channelId = "channelId_1",
-                channelName = "channelName_1"
-            ),
-            ChatMessageEntity(
-                id = "chatMessage_2",
-                userId = "userId_2",
-                userName = "userName_2",
-                displayName = "displayName_2",
-                message = "message_2",
-                source = SourceEnum.YOUTUBE,
-                channelId = "channelId_2",
-                channelName = "channelName_2"
-            )
-        )
-    )
-
-    ChatMessage(
-        innerPadding = PaddingValues(12.dp),
-        chatState = chatState
-    )
 }
