@@ -1,6 +1,6 @@
 package com.js.integratedchat.domain.usecase
 
-import Constants.TWITCH_DESKTOP_REDIRECT_URI
+import Constants.TWITCH_REDIRECT_URI
 import Constants.TWITCH_SCOPES
 import Constants.TWITCH_TOKEN
 import Constants.TWITCH_TOKEN_URL
@@ -28,7 +28,7 @@ actual class AuthTwitchUseCase(
 
         val uri = "https://id.twitch.tv/oauth2/authorize" +
             "?client_id=${BuildConfig.TWITCH_CLIENT_ID}" +
-            "&redirect_uri=$TWITCH_DESKTOP_REDIRECT_URI" +
+            "&redirect_uri=$TWITCH_REDIRECT_URI" +
             "&response_type=code" +
             "&scope=$scopes"
 
@@ -50,7 +50,7 @@ actual class AuthTwitchUseCase(
                 BuildConfig.TWITCH_CLIENT_ID,
                 BuildConfig.TWITCH_CLIENT_SECRET,
                 authorizationCode,
-                TWITCH_DESKTOP_REDIRECT_URI
+                TWITCH_REDIRECT_URI
             ).last()
 
             user = userRepository.fetchUserTwitch(

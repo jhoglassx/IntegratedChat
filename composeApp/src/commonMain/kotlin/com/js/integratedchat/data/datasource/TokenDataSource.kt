@@ -8,7 +8,7 @@ interface TokenDataSource {
     suspend fun fetchToken(
         tokenUrl: String,
         clientId: String,
-        clientSecret: String? = null,
+        clientSecret: String,
         authorizationCode: String,
         redirectUri: String
     ): Flow<TokenResponseRemoteEntity>

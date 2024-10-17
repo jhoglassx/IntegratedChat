@@ -24,7 +24,7 @@ class TokenDataSourceImpl(
     override suspend fun fetchToken(
         tokenUrl: String,
         clientId: String,
-        clientSecret: String?,
+        clientSecret: String,
         authorizationCode: String,
         redirectUri: String
     ): Flow<TokenResponseRemoteEntity> = flow {

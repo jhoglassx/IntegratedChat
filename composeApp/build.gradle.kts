@@ -321,8 +321,8 @@ tasks.register("generateBuildConfig") {
             "TWITCH_CLIENT_SECRET",
             "GOOGLE_DESKTOP_CLIENT_ID",
             "GOOGLE_DESKTOP_CLIENT_SECRET",
-            "GOOGLE_ANDROID_CLIENT_ID",
-            "GOOGLE_ANDROID_CLIENT_SECRET"
+            "GOOGLE_WEB_CLIENT_ID",
+            "GOOGLE_WEB_CLIENT_SECRET"
         )
 
         if (isLocalOrDebug && propertiesFile.exists()) {

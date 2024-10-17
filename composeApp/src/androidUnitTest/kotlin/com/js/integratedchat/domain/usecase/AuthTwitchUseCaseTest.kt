@@ -1,6 +1,6 @@
 package com.js.integratedchat.domain.usecase
 
-import Constants.TWITCH_DESKTOP_REDIRECT_URI
+import Constants.TWITCH_REDIRECT_URI
 import Constants.TWITCH_SCOPES
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.Status
@@ -50,7 +50,7 @@ class AuthTwitchUseCaseTest {
 
         val uri = "https://id.twitch.tv/oauth2/authorize" +
                 "?client_id=${BuildConfig.TWITCH_CLIENT_ID}" +
-                "&redirect_uri=$TWITCH_DESKTOP_REDIRECT_URI" +
+                "&redirect_uri=$TWITCH_REDIRECT_URI" +
                 "&response_type=code" +
                 "&scope=$scopes"
 
