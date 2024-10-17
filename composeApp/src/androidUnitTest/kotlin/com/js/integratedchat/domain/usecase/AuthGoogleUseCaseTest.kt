@@ -8,25 +8,14 @@ import android.util.Log
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.Status
-import com.js.integratedchat.data.repository.TokenRepository
-import com.js.integratedchat.data.repository.UserRepository
-import com.js.integratedchat.domain.entity.TokenEntity
-import com.js.integratedchat.domain.entity.UserEntity
 import io.kotest.matchers.shouldBe
 import io.mockk.MockKAnnotations
-import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.mockkConstructor
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.last
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -36,10 +25,7 @@ class AuthGoogleUseCaseTest {
 
     @MockK
     private lateinit var context: Context
-    @MockK
-    private lateinit var tokenRepository: TokenRepository
-    @MockK
-    private lateinit var userRepository: UserRepository
+
     @MockK
     private lateinit var packageManager: PackageManager
 
@@ -49,7 +35,7 @@ class AuthGoogleUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        authGoogleUseCase = AuthGoogleUseCase(context, tokenRepository, userRepository)
+        authGoogleUseCase = AuthGoogleUseCase(context)
     }
 
     @After
@@ -94,53 +80,5 @@ class AuthGoogleUseCaseTest {
 
         // Then
         result shouldBe signInIntent
-    }
-
-    @Test
-    fun `getUser should return user when valid authorizationCode is provided`() = runTest {
-        // Given
-        val authorizationCode = "validAuthorizationCode"
-        val tokenResponse = TokenEntity(
-            refreshToken = "refreshToken",
-            accessToken = "accessToken",
-            tokenType = "tokenType",
-            expiresIn = 10
-        )
-        val userEntity = UserEntity(
-            id = "id",
-            name = "name",
-            displayName = "displayName",
-            email = "email",
-            imageUrl = "imageUrl"
-        )
-        coEvery {
-            tokenRepository.fetchToken(any(), any(), any(), any(), any())
-        } returns flow { emit(tokenResponse) }
-        coEvery {
-            userRepository.fetchUserGoogle(any(), any(), any())
-        } returns flow { emit(userEntity) }
-
-        // When
-        val resultFlow: Flow<UserEntity> = authGoogleUseCase.getUser(authorizationCode)
-        val result = resultFlow.last()
-
-        // Then
-        result shouldBe userEntity
-    }
-
-    @Test
-    fun `getUser should return empty flow when ApiException is thrown`() = runTest {
-        // Given
-        val authorizationCode = "invalidAuthorizationCode"
-        coEvery {
-            tokenRepository.fetchToken(any(), any(), any(), any(), any())
-        } throws ApiException(Status.RESULT_CANCELED)
-
-        // When
-        val resultFlow: Flow<UserEntity> = authGoogleUseCase.getUser(authorizationCode)
-        val result = resultFlow.toList()
-
-        // Then
-        result.size shouldBe 0
     }
 }

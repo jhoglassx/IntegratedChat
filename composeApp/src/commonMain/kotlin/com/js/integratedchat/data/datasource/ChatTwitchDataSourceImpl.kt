@@ -1,7 +1,8 @@
 package com.js.integratedchat.data.datasource
 
-import Constants.TWITCH_EMOTE_CACHE
+import Constants.TWITCH_BADGES_CACHE
 import Constants.TWITCH_TOKEN
+import com.js.integratedchat.data.Keys
 import com.js.integratedchat.data.entity.ChatMessageEntityRemote
 import com.js.integratedchat.data.entity.EmotePositionRemoteEntity
 import com.js.integratedchat.data.entity.EmoteRemoteEntity
@@ -54,7 +55,7 @@ class ChatTwitchDataSourceImpl(
 
         val badges = tags["badges"]?.split(",")?.mapNotNull {
             val keyValue = it.split("/")
-            if (keyValue.size == 2) TWITCH_EMOTE_CACHE[keyValue[0] + "/" + keyValue[1]] else null
+            if (keyValue.size == 2) TWITCH_BADGES_CACHE[keyValue[0] + "/" + keyValue[1]] else null
         }
 
         val emotes = tags["emotes"]?.split("/")?.mapNotNull {
@@ -77,7 +78,7 @@ class ChatTwitchDataSourceImpl(
                 }
                 EmoteRemoteEntity(
                     emoteId = emoteId,
-                    imgUrl = "",
+                    imgUrl = "https://static-cdn.jtvnw.net/emoticons/v2/${emoteId}/default/dark/1.0",
                     positions = ranges
                 )
             } else {
