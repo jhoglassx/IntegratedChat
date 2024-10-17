@@ -1,6 +1,6 @@
 package com.js.integratedchat.domain.usecase
 
-import Constants.GOOGLE_DESKTOP_REDIRECT_URI
+import Constants.GOOGLE_REDIRECT_URI
 import Constants.GOOGLE_SCOPES
 import Constants.GOOGLE_TOKEN
 import Constants.GOOGLE_TOKEN_URL
@@ -41,8 +41,8 @@ actual class AuthGoogleUseCase(
     private fun getGoogleSignInOptions() = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
         .requestEmail()
         .requestScopes(Scope(GOOGLE_SCOPES))
-        .requestIdToken(BuildConfig.GOOGLE_ANDROID_CLIENT_ID)
-        .requestServerAuthCode(BuildConfig.GOOGLE_ANDROID_CLIENT_ID)
+        .requestIdToken(BuildConfig.GOOGLE_WEB_CLIENT_ID)
+        .requestServerAuthCode(BuildConfig.GOOGLE_WEB_CLIENT_ID)
         .build()
 
     actual suspend fun getUser(
@@ -53,15 +53,16 @@ actual class AuthGoogleUseCase(
         try {
             val tokenResponse = tokenRepository.fetchToken(
                 tokenUrl = GOOGLE_TOKEN_URL,
-                clientId = BuildConfig.GOOGLE_ANDROID_CLIENT_ID,
+                clientId = BuildConfig.GOOGLE_WEB_CLIENT_ID,
+                clientSecret = BuildConfig.GOOGLE_WEB_CLIENT_SECRET,
                 authorizationCode = authorizationCode,
-                redirectUri = GOOGLE_DESKTOP_REDIRECT_URI
+                redirectUri = GOOGLE_REDIRECT_URI
             ).last()
 
             user = userRepository.fetchUserGoogle(
                 GOOGLE_USER_URL,
                 tokenResponse.accessToken,
-                BuildConfig.GOOGLE_ANDROID_CLIENT_ID
+                BuildConfig.GOOGLE_WEB_CLIENT_ID
             ).last()
 
             GOOGLE_TOKEN = tokenResponse.accessToken

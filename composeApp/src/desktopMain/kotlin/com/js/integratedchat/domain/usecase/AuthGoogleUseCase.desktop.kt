@@ -1,6 +1,6 @@
 package com.js.integratedchat.domain.usecase
 
-import Constants.GOOGLE_DESKTOP_REDIRECT_URI
+import Constants.GOOGLE_REDIRECT_URI
 import Constants.GOOGLE_SCOPES
 import Constants.GOOGLE_TOKEN
 import Constants.GOOGLE_TOKEN_URL
@@ -21,7 +21,7 @@ actual class AuthGoogleUseCase(
     actual suspend fun signIn(): Any? {
         val authUrl = "https://accounts.google.com/o/oauth2/auth" +
             "?client_id=${URLEncoder.encode(BuildConfig.GOOGLE_DESKTOP_CLIENT_ID, "UTF-8")}" +
-            "&redirect_uri=${URLEncoder.encode(GOOGLE_DESKTOP_REDIRECT_URI, "UTF-8")}" +
+            "&redirect_uri=${URLEncoder.encode(GOOGLE_REDIRECT_URI, "UTF-8")}" +
             "&response_type=code" +
             "&scope=${URLEncoder.encode(GOOGLE_SCOPES, "UTF-8")}"
 
@@ -44,7 +44,7 @@ actual class AuthGoogleUseCase(
                 BuildConfig.GOOGLE_DESKTOP_CLIENT_ID,
                 BuildConfig.GOOGLE_DESKTOP_CLIENT_SECRET,
                 authorizationCode,
-                GOOGLE_DESKTOP_REDIRECT_URI
+                GOOGLE_REDIRECT_URI
             ).last()
 
             user = userRepository.fetchUserGoogle(
