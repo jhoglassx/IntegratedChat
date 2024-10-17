@@ -1,4 +1,4 @@
-import com.js.project.data.entity.BadgeResponse
+import com.js.integratedchat.data.entity.BadgeResponse
 import java.util.concurrent.ConcurrentHashMap
 
 object Constants {

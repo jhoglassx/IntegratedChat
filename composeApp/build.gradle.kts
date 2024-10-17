@@ -177,7 +177,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.js.project"
+    namespace = "com.js.integratedchat"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
@@ -185,7 +185,7 @@ android {
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
-        applicationId = "com.js.project"
+        applicationId = "com.js.integratedchat"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -229,11 +229,11 @@ android {
 
 compose.desktop {
     application {
-        mainClass = "com.js.project.ui.main.MainKt"
+        mainClass = "com.js.integratedchat.ui.main.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.js.project"
+            packageName = "com.js.integratedchat"
             packageVersion = "1.0.0"
         }
     }
@@ -321,8 +321,8 @@ tasks.register("generateBuildConfig") {
             "TWITCH_CLIENT_SECRET",
             "GOOGLE_DESKTOP_CLIENT_ID",
             "GOOGLE_DESKTOP_CLIENT_SECRET",
-            "GOOGLE_WEB_CLIENT_ID",
-            "GOOGLE_WEB_CLIENT_SECRET"
+            "GOOGLE_ANDROID_CLIENT_ID",
+            "GOOGLE_ANDROID_CLIENT_SECRET"
         )
 
         if (isLocalOrDebug && propertiesFile.exists()) {
@@ -351,7 +351,7 @@ tasks.named("build") {
 
 fun buildConfigFileContentFromLocal(properties: Properties): String {
     val sb = StringBuilder()
-    sb.append("package com.js.project\n\n")
+    sb.append("package com.js.integratedchat\n\n")
     sb.append("object BuildConfig {\n")
     properties.forEach { (key, value) ->
         sb.append("    const val ${key.toString().uppercase(Locale.getDefault())} = $value\n")
@@ -363,7 +363,7 @@ fun buildConfigFileContentFromLocal(properties: Properties): String {
 
 fun buildConfigFileContentFromEnv(keys: List<String>): String {
     val sb = StringBuilder()
-    sb.append("package com.js.project\n\n")
+    sb.append("package com.js.integratedchat\n\n")
     sb.append("object BuildConfig {\n")
 
     keys.forEach { key ->
