@@ -16,7 +16,7 @@ object Constants {
     const val TWITCH_SCOPES = "user:read:email chat:read chat:edit"
     const val TWITCH_TOKEN_URL = "https://id.twitch.tv/oauth2/token"
     const val TWITCH_USER_INFO_URL = "https://api.twitch.tv/helix/users"
-    val TWITCH_EMOTE_CACHE = ConcurrentHashMap<String, BadgeResponse>()
+    val TWITCH_BADGES_CACHE = ConcurrentHashMap<String, BadgeResponse>()
     var TWITCH_TOKEN = ""
 
     //EMOTE

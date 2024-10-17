@@ -1,19 +1,17 @@
 package com.js.integratedchat.data.datasource
 
-import com.js.integratedchat.data.entity.UserResponseRemoteEntity
+import com.js.integratedchat.data.entity.UserGoogleRemoteEntity
+import com.js.integratedchat.data.entity.UserResponse
+import com.js.integratedchat.data.entity.UserTwitchRemoteEntity
 import com.js.integratedchat.provider.DispatcherProvider
 import com.js.integratedchat.service.ApiService
+import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 
 class UserDataSourceImpl(
     private val apiService: ApiService,
@@ -24,7 +22,7 @@ class UserDataSourceImpl(
         userInfoUrl: String,
         accessToken: String,
         clientId: String
-    ): Flow<UserResponseRemoteEntity> = flow {
+    ): Flow<UserGoogleRemoteEntity> = flow {
 
         val response: HttpResponse = apiService.request(
             url = userInfoUrl,
@@ -39,16 +37,7 @@ class UserDataSourceImpl(
         )
 
         if (response.status == HttpStatusCode.OK) {
-            val responseBody = response.bodyAsText()
-            val json = Json.parseToJsonElement(responseBody).jsonObject
-
-            val user = UserResponseRemoteEntity(
-                id = json["id"]?.jsonPrimitive?.content ?: "",
-                email = json["email"]?.jsonPrimitive?.content ?: "",
-                name = json["given_name"]?.jsonPrimitive?.content ?: "",
-                displayName = json["name"]?.jsonPrimitive?.content ?: "",
-                imageUrl = json["picture"]?.jsonPrimitive?.content
-            )
+            val user = response.body<UserGoogleRemoteEntity>()
             emit(user)
         }
     }.flowOn(dispatcherProvider.IO)
@@ -57,7 +46,7 @@ class UserDataSourceImpl(
         userInfoUrl: String,
         accessToken: String,
         clientId: String
-    ): Flow<UserResponseRemoteEntity> = flow{
+    ): Flow<UserTwitchRemoteEntity> = flow{
 
         val response: HttpResponse = apiService.request(
             url = userInfoUrl,
@@ -69,20 +58,8 @@ class UserDataSourceImpl(
         )
 
         if (response.status == HttpStatusCode.OK) {
-            val responseBody = response.bodyAsText()
-            val json = Json.parseToJsonElement(responseBody).jsonObject
-
-            val userData = json["data"]?.jsonArray?.firstOrNull()?.jsonObject
-
-            emit(
-                UserResponseRemoteEntity(
-                    id = userData?.get("id")?.jsonPrimitive?.content ?: "",
-                    email = userData?.get("email")?.jsonPrimitive?.content ?: "",
-                    name = userData?.get("login")?.jsonPrimitive?.content ?: "",
-                    displayName = userData?.get("display_name")?.jsonPrimitive?.content ?: "",
-                    imageUrl = userData?.get("profile_image_url")?.jsonPrimitive?.content
-                )
-            )
+            val user = response.body<UserResponse>()
+            emit(user.data.first())
         }
     }.flowOn(dispatcherProvider.IO)
 }

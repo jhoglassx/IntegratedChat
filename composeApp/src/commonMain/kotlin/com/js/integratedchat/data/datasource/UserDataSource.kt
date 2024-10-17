@@ -1,6 +1,8 @@
 package com.js.integratedchat.data.datasource
 
-import com.js.integratedchat.data.entity.UserResponseRemoteEntity
+import com.js.integratedchat.data.entity.UserGoogleRemoteEntity
+import com.js.integratedchat.data.entity.UserRemoteEntity
+import com.js.integratedchat.data.entity.UserTwitchRemoteEntity
 import kotlinx.coroutines.flow.Flow
 
 interface UserDataSource {
@@ -9,12 +11,12 @@ interface UserDataSource {
         userInfoUrl: String,
         accessToken: String,
         clientId: String
-    ): Flow<UserResponseRemoteEntity>
+    ): Flow<UserGoogleRemoteEntity>
 
     suspend fun fetchUserTwitch(
         userInfoUrl: String,
         accessToken: String,
         clientId: String
-    ): Flow<UserResponseRemoteEntity>
+    ): Flow<UserTwitchRemoteEntity>
 }
 

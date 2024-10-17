@@ -2,12 +2,13 @@ package com.js.integratedchat.data.datasource
 
 import Constants.GOOGLE_LIVE_CHAT_ID
 import Constants.GOOGLE_TOKEN
-import com.js.integratedchat.data.entity.UserResponseRemoteEntity
+import com.js.integratedchat.data.entity.UserRemoteEntity
 import com.js.integratedchat.provider.DispatcherProvider
 import com.js.integratedchat.service.ApiService
 import io.kotest.matchers.shouldBe
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.mockk.MockKAnnotations
@@ -17,6 +18,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.unmockkAll
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -61,92 +63,116 @@ class ChatYoutubeDataSourceImplTest {
     }
 
     @Test
-    fun `getYouTubeChat should return chat messages when API call is successful`() = runTest {
-        // Given
-        val googleUser = UserResponseRemoteEntity(
-            id = "userId",
-            name = "Author",
-            email = "",
-            displayName = "Author",
-            imageUrl = ""
+    fun `getYouTubeChat emits messages on success`() = runTest {
+        // Arrange
+        val googleUser = UserRemoteEntity(
+            id = "id",
+            email = "email",
+            name = "name",
+            displayName = "displayName",
+            imageUrl = "imageUrl"
         )
-        val responseJson = """{
-            "items": [
-                {
-                    "id": "messageId",
-                    "snippet": {
-                        "publishedAt": "2021-09-01T00:00:00Z",
-                        "displayMessage": "Hello, world!"
-                    },
-                    "authorDetails": {
-                        "displayName": "Author",
-                        "channelId": "userId",
-                        "isChatOwner": true,
-                        "isChatModerator": false,
-                        "isChatSponsor": false
+        val mockResponse = mockk<HttpResponse>()
+        val jsonResponse = """
+            {
+                "items": [
+                    {
+                        "id": "message1",
+                        "snippet": {
+                            "publishedAt": "2024-10-10T10:00:00Z",
+                            "displayMessage": "Hello, world!"
+                        },
+                        "authorDetails": {
+                            "displayName": "Author1",
+                            "channelId": "channel1"
+                        }
                     }
-                }
-            ],
-            "nextPageToken": ""
-        }"""
+                ],
+                "nextPageToken": "nextPageToken"
+            }
+        """
 
-        val httpResponse: HttpResponse = mockk {
-            coEvery { status } returns HttpStatusCode.OK
-            coEvery { body<String>() } returns responseJson
-        }
-
+        every { mockResponse.status } returns HttpStatusCode.OK
+        //coEvery { mockResponse.bodyAsText() } returns jsonResponse
         coEvery {
+            apiService.request(
+                url = any(),
+                method = HttpMethod.Get,
+                headers = any(),
+                queryParams = any()
+            )
+        } returns mockResponse
+
+        // Act
+        val messages = chatYoutubeDataSource.getYouTubeChat(googleUser).toList()
+
+        // Assert
+        assertEquals(1, messages.size)
+        val message = messages[0]
+        message.id shouldBe "message1"
+        message.displayName shouldBe "Author1"
+        message.message shouldBe "Hello, world!"
+        message.userId shouldBe "channel1"
+        message.source shouldBe SourceEnum.YOUTUBE
+
+        coVerify(exactly = 1) {
             apiService.request(
                 url = "https://www.googleapis.com/youtube/v3/liveChat/messages",
                 method = HttpMethod.Get,
                 headers = mapOf("Authorization" to "Bearer $GOOGLE_TOKEN"),
                 queryParams = mapOf(
-                    "liveChatId" to GOOGLE_LIVE_CHAT_ID.toString(),
+                    "liveChatId" to GOOGLE_LIVE_CHAT_ID,
                     "part" to "snippet,authorDetails",
                     "pageToken" to ""
                 )
             )
-        } returns httpResponse
-
-        // When
-        val result = chatYoutubeDataSource.getYouTubeChat(googleUser).first()
-
-        // Then
-
-        val chatMessage = result
-        chatMessage.id shouldBe "messageId"
-        chatMessage.displayName shouldBe "Author"
-        chatMessage.message shouldBe "Hello, world!"
-
-        coVerify(exactly = 1) {
-            apiService.request(any(), any(), any(), any(), any())
         }
     }
 
     @Test
-    fun `getYouTubeChat should handle exceptions gracefully`() = runTest {
-        // Given
-        val googleUser = UserResponseRemoteEntity(
-            id = "userId",
-            name = "Author",
-            email = "",
-            displayName = "Author",
-            imageUrl = ""
+    fun `getYouTubeChat logs error on failure`() = runTest {
+        // Arrange
+        val googleUser = UserRemoteEntity(
+            id = "id",
+            email = "email",
+            name = "name",
+            displayName = "displayName",
+            imageUrl = "imageUrl"
         )
+        val mockResponse = mockk<HttpResponse>()
+
+        every { mockResponse.status } returns HttpStatusCode.BadRequest
+        coEvery { mockResponse.bodyAsText() } returns "Error"
+
         coEvery {
-            apiService.request(any(), any(), any(), any(), any())
-        } throws Exception("Network error")
+            apiService.request(
+                url = any(),
+                method = HttpMethod.Get,
+                headers = any(),
+                queryParams = any()
+            )
+        } returns mockResponse
 
-        // When
-        val result = chatYoutubeDataSource.getYouTubeChat(googleUser).toList()
+        // Act
+        chatYoutubeDataSource.getYouTubeChat(googleUser).first()
 
-        // Then
-        result.size shouldBe 0
-
+        // Assert
         coVerify(exactly = 1) {
-            apiService.request(any(), any(), any(), any(), any())
+            apiService.request(
+                url = "https://www.googleapis.com/youtube/v3/liveChat/messages",
+                method = HttpMethod.Get,
+                headers = mapOf("Authorization" to "Bearer $GOOGLE_TOKEN"),
+                queryParams = mapOf(
+                    "liveChatId" to GOOGLE_LIVE_CHAT_ID,
+                    "part" to "snippet,authorDetails",
+                    "pageToken" to ""
+                )
+            )
         }
     }
+
+
+
 
     @Test
     fun `isLiveStreamActive should emit true when response is OK and items are not empty`() = runTest {

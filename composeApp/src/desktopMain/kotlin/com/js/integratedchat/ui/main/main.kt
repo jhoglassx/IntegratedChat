@@ -4,7 +4,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import co.touchlab.kermit.Logger
 import com.js.integratedchat.di.initKoin
+import com.js.integratedchat.ext.error
+import com.js.integratedchat.ext.info
 import com.js.integratedchat.service.ServerService
 import com.js.integratedchat.provider.DispatcherProvider
 import com.js.integratedchat.ui.app.App
@@ -105,9 +108,9 @@ private fun handleServerTwitch(
     authManager.server(8080) { code ->
         if (code != null) {
             authViewModel.onAction(AuthAction.GetTwitchUser(code))
-            //Log.d("AuthCallback", "Authorization code received: $code")
+            Logger.info("main", "handleServerTwitch -> Authorization code received: $code")
         } else {
-            //Log.e("AuthCallback", "Authorization code not found")
+            Logger.error("main", "handleServerTwitch ->  Authorization code not found")
         }
         authManager.server(8080) {}.stop(1000, 10000)
     }
@@ -120,9 +123,9 @@ private fun handleServerGoogle(
     authManager.server(8081) { code ->
         if (code != null) {
             authViewModel.onAction(AuthAction.GetGoogleUser(code))
-            //Log.d("AuthCallback", "Authorization code received: $code")
+            Logger.info("main", "handleServerGoogle -> Authorization code received: $code")
         } else {
-            //Log.e("AuthCallback", "Authorization code not found")
+            Logger.error("main", "handleServerGoogle ->  Authorization code not found")
         }
         authManager.server(8081) {}.stop(1000, 10000)
     }

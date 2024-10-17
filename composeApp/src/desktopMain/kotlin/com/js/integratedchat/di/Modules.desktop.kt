@@ -8,6 +8,5 @@ import org.koin.dsl.module
 
 actual val platformModule = module {
     singleOf(::AuthGoogleUseCase)
-    singleOf(::AuthTwitchUseCase)
     singleOf(::DispatcherProvider)
 }

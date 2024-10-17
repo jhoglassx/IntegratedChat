@@ -1,13 +1,13 @@
 package com.js.integratedchat.data.datasource
 
 import com.js.integratedchat.data.entity.ChatMessageEntityRemote
-import com.js.integratedchat.data.entity.UserResponseRemoteEntity
+import com.js.integratedchat.data.entity.UserRemoteEntity
 import kotlinx.coroutines.flow.Flow
 
 interface ChatYoutubeDataSource {
 
     suspend fun getYouTubeChat(
-        googleUser: UserResponseRemoteEntity
+        googleUser: UserRemoteEntity
     ): Flow<ChatMessageEntityRemote>
 
     suspend fun isLiveStreamActive(): Flow<Boolean>
