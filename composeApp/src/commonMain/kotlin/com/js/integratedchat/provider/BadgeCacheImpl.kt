@@ -46,12 +46,6 @@ class BadgeCacheImpl(
                 "Content-Type" to "application/json",
                 "Authorization" to "Bearer $TWITCH_TOKEN",
                 "Client-Id" to Keys.twitchClientId
-            ),
-            body = mapOf(
-
-            ),
-            queryParams = mapOf(
-                //"broadcaster_id" to channel
             )
         )
 

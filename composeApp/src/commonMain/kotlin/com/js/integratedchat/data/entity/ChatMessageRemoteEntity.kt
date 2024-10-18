@@ -1,6 +1,5 @@
 package com.js.integratedchat.data.entity
 
-import com.js.integratedchat.data.datasource.SourceEnum
 import com.js.integratedchat.domain.entity.BadgeEntity
 import com.js.integratedchat.domain.entity.ChatMessageEntity
 import kotlinx.datetime.Instant
