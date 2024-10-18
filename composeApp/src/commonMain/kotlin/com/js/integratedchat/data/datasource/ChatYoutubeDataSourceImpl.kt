@@ -5,6 +5,7 @@ import Constants.GOOGLE_TOKEN
 import co.touchlab.kermit.Logger
 import com.js.integratedchat.data.entity.ChatMessageEntityRemote
 import com.js.integratedchat.data.entity.ChatYoutubeResponse
+import com.js.integratedchat.data.entity.LiveBroadcastsResponse
 import com.js.integratedchat.data.entity.UserRemoteEntity
 import com.js.integratedchat.data.entity.toRemote
 import com.js.integratedchat.ext.error
@@ -62,6 +63,7 @@ class ChatYoutubeDataSourceImpl(
                         chatMessages.forEach {
                             emit(it)
                         }
+                        break
                     } else {
                         Logger.error(
                             tag = "ChatYoutubeDataSourceImpl",
@@ -101,12 +103,11 @@ class ChatYoutubeDataSourceImpl(
                 )
 
                 if (response.status == HttpStatusCode.OK) {
-                    val responseBody = response.bodyAsText()
-                    val json = Json.parseToJsonElement(responseBody).jsonObject
-                    val items = json["items"]?.jsonArray ?: emptyList()
+                    val responseBody = response.body<LiveBroadcastsResponse>()
 
-                    emit(items.isNotEmpty())
-                    if(items.isNotEmpty()){
+                    val hasItems = responseBody.items.isNotEmpty()
+                    emit(hasItems)
+                    if(hasItems){
                         break
                     }
                 } else {
