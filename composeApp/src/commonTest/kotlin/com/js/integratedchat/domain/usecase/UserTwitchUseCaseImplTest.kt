@@ -1,10 +1,5 @@
 package com.js.integratedchat.domain.usecase
 
-import Constants.TWITCH_REDIRECT_URI
-import Constants.TWITCH_SCOPES
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.Status
-import com.js.integratedchat.BuildConfig
 import com.js.integratedchat.data.repository.TokenRepository
 import com.js.integratedchat.data.repository.UserRepository
 import com.js.integratedchat.domain.entity.TokenEntity
@@ -20,45 +15,30 @@ import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
-import java.net.URLEncoder
 import kotlin.test.Test
 
-class AuthTwitchUseCaseTest {
+class UserTwitchUseCaseImplTest {
+
 
     @MockK
     private lateinit var tokenRepository: TokenRepository
     @MockK
     private lateinit var userRepository: UserRepository
 
-    private lateinit var authTwitchUseCase: AuthTwitchUseCase
+    private lateinit var userTwitchUseCase: UserTwitchUseCase
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        authTwitchUseCase = AuthTwitchUseCase(tokenRepository, userRepository)
+        userTwitchUseCase = UserTwitchUseCaseImpl(
+            userRepository = userRepository,
+            tokenRepository = tokenRepository
+        )
     }
 
     @After
     fun tearDown() {
         unmockkAll()
-    }
-
-    @Test
-    fun `signIn should return correct intent`() = runTest {
-
-        val scopes: String = URLEncoder.encode(listOf(TWITCH_SCOPES).joinToString(" "), "UTF-8")
-
-        val uri = "https://id.twitch.tv/oauth2/authorize" +
-                "?client_id=${BuildConfig.TWITCH_CLIENT_ID}" +
-                "&redirect_uri=$TWITCH_REDIRECT_URI" +
-                "&response_type=code" +
-                "&scope=$scopes"
-
-        // When
-        val result = authTwitchUseCase.signIn() as String
-
-        // Then
-        result shouldBe  uri
     }
 
     @Test
@@ -87,7 +67,7 @@ class AuthTwitchUseCaseTest {
         } returns flowOf(user)
 
         // When
-        val result = authTwitchUseCase.getUser(authorizationCode).last()
+        val result = userTwitchUseCase.getUser(authorizationCode).last()
 
         // Then
         result shouldBe user
@@ -100,10 +80,10 @@ class AuthTwitchUseCaseTest {
 
         coEvery {
             tokenRepository.fetchToken(any(), any(), any(), any(), any())
-        } throws ApiException(Status.RESULT_CANCELED)
+        } throws Exception("Status.RESULT_CANCELED")
 
         // When
-        val result = authTwitchUseCase.getUser(authorizationCode).lastOrNull()
+        val result = userTwitchUseCase.getUser(authorizationCode).lastOrNull()
 
         // Then
         result shouldBe null

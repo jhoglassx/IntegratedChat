@@ -1,6 +1,6 @@
 package com.js.integratedchat.domain.entity
 
-import com.js.integratedchat.data.datasource.SourceEnum
+import com.js.integratedchat.data.entity.SourceEnum
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable

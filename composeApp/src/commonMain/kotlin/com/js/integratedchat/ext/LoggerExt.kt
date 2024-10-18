@@ -8,6 +8,6 @@ fun Logger.info(tag: String, message: String) {
 }
 
 // Função de extensão para logging de erros
-fun Logger.error(tag: String, throwable: Throwable? = null, message: String) {
+fun Logger.error(tag: String, message: String, throwable: Throwable? = null) {
     this.e(tag = tag, throwable = throwable, message = { message })
 }

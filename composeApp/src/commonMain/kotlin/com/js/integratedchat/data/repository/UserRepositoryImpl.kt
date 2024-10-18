@@ -24,10 +24,7 @@ class UserRepositoryImpl(
             clientId = clientId
         ).last().toRemote()
 
-        Logger.info(
-            tag = "UserRepositoryImpl",
-            message = "fetchUserGoogle -> result: $result"
-        )
+        Logger.info("UserRepositoryImpl","fetchUserGoogle -> result: $result")
 
         emit(result)
     }
@@ -43,10 +40,7 @@ class UserRepositoryImpl(
            clientId = clientId
        ).last().toRemote()
 
-        Logger.info(
-            tag = "UserRepositoryImpl",
-            message = "fetchUserTwitch -> result: $result"
-        )
+        Logger.info("UserRepositoryImpl","fetchUserTwitch -> result: $result")
 
         emit(result)
     }

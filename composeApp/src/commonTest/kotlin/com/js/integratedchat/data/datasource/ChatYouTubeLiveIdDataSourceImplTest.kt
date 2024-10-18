@@ -1,11 +1,19 @@
 package com.js.integratedchat.data.datasource
 
 
+import Constants.GOOGLE_TOKEN
+import co.touchlab.kermit.Logger
+import com.js.integratedchat.data.entity.LiveChatIdResponse
+import com.js.integratedchat.data.entity.LiveChatItem
+import com.js.integratedchat.data.entity.LiveChatSnippet
+import com.js.integratedchat.ext.error
 import com.js.integratedchat.provider.DispatcherProvider
 import com.js.integratedchat.service.ApiService
 import io.kotest.matchers.shouldBe
+import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -13,9 +21,13 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import io.mockk.mockkObject
 import io.mockk.unmockkAll
+import io.mockk.unmockkObject
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
@@ -28,6 +40,7 @@ import kotlinx.serialization.json.put
 import org.junit.After
 import org.junit.Before
 import kotlin.test.Test
+import kotlin.test.assertFailsWith
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ChatYouTubeLiveIdDataSourceImplTest {
@@ -64,79 +77,86 @@ class ChatYouTubeLiveIdDataSourceImplTest {
         unmockkAll()
     }
 
-
     @Test
-    fun `getYouTubeLiveChatId returns live chat ID when response is successful`() = runTest {
+    fun `getYouTubeLiveChatId should emit chat ID when response is OK`() = runTest {
         // Given
-        val channelId = "testChannelId"
-        val liveChatId = "testLiveChatId"
-        val jsonResponse = buildJsonObject {
-            put("items", buildJsonArray {
-                add(buildJsonObject {
-                    put("snippet", buildJsonObject {
-                        put("liveChatId", liveChatId)
-                    })
-                })
-            })
-        }
-        val response: HttpResponse = mockk {
-            coEvery { status } returns HttpStatusCode.OK
-            coEvery { bodyAsText() } returns jsonResponse.toString()
-        }
+        val channelId = "dummyChannelId"
+        val expectedLiveChatId = "dummyLiveChatId"
+        val response = mockk<HttpResponse>(relaxed = true)
+        val liveChatIdResponse = LiveChatIdResponse(
+            items = listOf(
+                LiveChatItem(snippet = LiveChatSnippet(liveChatId = expectedLiveChatId))
+            )
+        )
+
+        // Mock API response
         coEvery {
-            apiService.request(any(), any(), any(), any())
+            apiService.request(
+                url = "https://www.googleapis.com/youtube/v3/liveBroadcasts",
+                method = HttpMethod.Get,
+                headers = mapOf("Authorization" to "Bearer $GOOGLE_TOKEN"),
+                queryParams = mapOf(
+                    "channelId" to channelId,
+                    "broadcastType" to "all",
+                    "broadcastStatus" to "active",
+                    "part" to "snippet"
+                )
+            )
         } returns response
+        every { response.status } returns HttpStatusCode.OK
+        coEvery { response.body<LiveChatIdResponse>() } returns liveChatIdResponse
 
         // When
-        val result = chatYouTubeLiveIdDataSource.getYouTubeLiveChatId(channelId).toList()
+        val flow = chatYouTubeLiveIdDataSource.getYouTubeLiveChatId(channelId)
 
         // Then
-        result shouldBe liveChatId
-        coVerify {
-            apiService.request(any(), any(), any(), any())
+        flow.collect { emittedChatId ->
+            emittedChatId shouldBe expectedLiveChatId
         }
-    }
 
-    @Test(expected = Exception::class)
-    fun `getYouTubeLiveChatId throws exception when response is not successful`() = runTest {
-        // Given
-        val channelId = "testChannelId"
-        val response: HttpResponse = mockk {
-            coEvery { status } returns HttpStatusCode.BadRequest
-        }
-        coEvery { apiService.request(any(), any(), any(), any()) } returns response
-
-        // When
-        chatYouTubeLiveIdDataSource.getYouTubeLiveChatId(channelId).toList()
-
-        // Then
-        // Exception is thrown
+        // Verify API call
         coVerify {
-            apiService.request(any(), any(), any(), any())
+            apiService.request(
+                url = "https://www.googleapis.com/youtube/v3/liveBroadcasts",
+                method = HttpMethod.Get,
+                headers = mapOf("Authorization" to "Bearer $GOOGLE_TOKEN"),
+                queryParams = mapOf(
+                    "channelId" to channelId,
+                    "broadcastType" to "all",
+                    "broadcastStatus" to "active",
+                    "part" to "snippet"
+                )
+            )
         }
     }
 
     @Test
-    fun `getYouTubeLiveChatId returns empty string when no live chat ID is found`() = runTest {
+    fun `getYouTubeLiveChatId should throw exception when response is not OK`() = runTest {
         // Given
-        val channelId = "testChannelId"
-        val jsonResponse = buildJsonObject {
-            put("items", buildJsonArray { })
-        }
-        val response: HttpResponse = mockk {
-            coEvery { status } returns HttpStatusCode.OK
-            coEvery { bodyAsText() } returns jsonResponse.toString()
-        }
-        coEvery { apiService.request(any(), any(), any(), any()) } returns response
+        val channelId = "dummyChannelId"
+        val response = mockk<HttpResponse>(relaxed = true)
 
-        // When
-        val result = chatYouTubeLiveIdDataSource.getYouTubeLiveChatId(channelId).toList()
+        // Mock API response
+        coEvery {
+            apiService.request(
+                url ="https://www.googleapis.com/youtube/v3/liveBroadcasts",
+                method = HttpMethod.Get,
+                headers = mapOf("Authorization" to "Bearer $GOOGLE_TOKEN"),
+                queryParams = mapOf(
+                    "channelId" to channelId,
+                    "broadcastType" to "all",
+                    "broadcastStatus" to "active",
+                    "part" to "snippet"
+                )
+            )
+        } returns response
+        every { response.status } returns HttpStatusCode.BadRequest
 
-        // Then
-        //result.size shouldBe 1
-        result shouldBe ""
-        coVerify {
-            apiService.request(any(), any(), any(), any())
+        // When & Then
+        val exception = assertFailsWith<Exception> {
+            chatYouTubeLiveIdDataSource.getYouTubeLiveChatId(channelId).first()
         }
+
+         exception.message shouldBe "Failed to fetch live chat ID: $response"
     }
 }

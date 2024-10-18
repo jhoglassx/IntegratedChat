@@ -1,31 +1,32 @@
 package com.js.integratedchat.data.datasource
 
-import io.mockk.MockKAnnotations
-import io.mockk.every
-import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.unmockkAll
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestCoroutineScheduler
+import com.js.integratedchat.data.entity.TokenResponseRemoteEntity
 import com.js.integratedchat.provider.DispatcherProvider
 import com.js.integratedchat.service.ApiService
 import io.kotest.matchers.shouldBe
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.unmockkAll
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-
 import org.junit.After
 import org.junit.Before
 import kotlin.test.Test
+import kotlin.test.assertFailsWith
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TokenDataSourceImplTest {
@@ -58,69 +59,68 @@ class TokenDataSourceImplTest {
         unmockkAll()
     }
 
-
     @Test
-    fun `fetchToken should return token response when API call is successful`() = runTest {
+    fun `fetchToken should emit token when response is OK`() = runTest {
         // Given
         val tokenUrl = "https://example.com/token"
-        val clientId = "clientId"
-        val clientSecret = "clientSecret"
-        val authorizationCode = "authCode"
+        val clientId = "dummyClientId"
+        val clientSecret = "dummyClientSecret"
+        val authorizationCode = "dummyAuthorizationCode"
         val redirectUri = "https://example.com/redirect"
-        val responseJson = """
-            {
-                "access_token": "accessToken",
-                "refresh_token": "refreshToken",
-                "expires_in": 3600,
-                "token_type": "Bearer"
-            }
-        """
-        val httpResponse = mockk<HttpResponse> {
-            coEvery { status } returns HttpStatusCode.OK
-            coEvery { body<String>() } returns responseJson
-        }
+        val tokenResponse = TokenResponseRemoteEntity(
+            accessToken = "dummyAccessToken",
+            refreshToken = "dummyRefreshToken",
+            expiresIn = 3600,
+            tokenType = "bearer"
+        )
+        val httpResponse = mockk<HttpResponse>(relaxed = true)
 
-        coEvery {
-            apiService.request(any(), any(), any(), any(), any())
-        } returns httpResponse
+        coEvery { apiService.request(any(), any(), any(), any()) } returns httpResponse
+        every { httpResponse.status } returns HttpStatusCode.OK
+        coEvery { httpResponse.body<TokenResponseRemoteEntity>() } returns tokenResponse
 
         // When
-        val result = tokenDataSource.fetchToken(tokenUrl, clientId, clientSecret, authorizationCode, redirectUri).toList()
+        val flow = tokenDataSource.fetchToken(
+            tokenUrl, clientId, clientSecret, authorizationCode, redirectUri
+        )
 
         // Then
-        result.size shouldBe 1
-        val tokenResponse = result[0]
-        tokenResponse.accessToken shouldBe "accessToken"
-        tokenResponse.refreshToken shouldBe "refreshToken"
-        tokenResponse.expiresIn shouldBe 3600
-        tokenResponse.tokenType shouldBe "Bearer"
+        flow.collect { emittedToken ->
+            emittedToken shouldBe tokenResponse
+        }
 
         coVerify {
-            apiService.request(any(), any(), any(), any(), any())
+            apiService.request(
+                url = tokenUrl,
+                method = HttpMethod.Post,
+                headers = mapOf("Content-Type" to "application/x-www-form-urlencoded"),
+                body = mapOf(
+                    "client_id" to clientId,
+                    "client_secret" to clientSecret,
+                    "code" to authorizationCode,
+                    "grant_type" to "authorization_code",
+                    "redirect_uri" to redirectUri
+                )
+            )
         }
     }
 
-    @Test(expected = Exception::class)
-    fun `fetchToken should throw exception when API call fails`() = runTest {
+    @Test
+    fun `fetchToken should throw exception when response is not OK`() = runTest {
         // Given
         val tokenUrl = "https://example.com/token"
-        val clientId = "clientId"
-        val clientSecret = "clientSecret"
-        val authorizationCode = "authCode"
+        val clientId = "dummyClientId"
+        val clientSecret = "dummyClientSecret"
+        val authorizationCode = "dummyAuthorizationCode"
         val redirectUri = "https://example.com/redirect"
-        val httpResponse = mockk<HttpResponse> {
-            coEvery { status } returns HttpStatusCode.BadRequest
-            coEvery { body<String>() } returns "Error response"
-        }
+        val httpResponse = mockk<HttpResponse>(relaxed = true)
 
-        coEvery {
-            apiService.request(any(), any(), any(), any(), any())
-        } returns httpResponse
-
-        // When
-        tokenDataSource.fetchToken(tokenUrl, clientId, clientSecret, authorizationCode, redirectUri).first()
+        coEvery { apiService.request(any(), any(), any(), any()) } returns httpResponse
+        every { httpResponse.status } returns HttpStatusCode.BadRequest
 
         // Then
-        // Exception is expected
+        assertFailsWith<Exception> {
+            tokenDataSource.fetchToken(tokenUrl, clientId, clientSecret, authorizationCode, redirectUri).first()
+        }
     }
 }

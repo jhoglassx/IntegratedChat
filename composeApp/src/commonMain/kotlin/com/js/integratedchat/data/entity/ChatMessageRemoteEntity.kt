@@ -1,6 +1,5 @@
 package com.js.integratedchat.data.entity
 
-import com.js.integratedchat.data.datasource.SourceEnum
 import com.js.integratedchat.domain.entity.BadgeEntity
 import com.js.integratedchat.domain.entity.ChatMessageEntity
 import kotlinx.datetime.Instant
@@ -23,12 +22,6 @@ data class ChatMessageEntityRemote(
     val channelName: String? = null
 )
 
-fun List<ChatMessageEntityRemote>.toDomain(): List<ChatMessageEntity> {
-    return this.map{
-        it.toDomain()
-    }
-}
-
 fun ChatMessageEntityRemote.toDomain() = ChatMessageEntity(
     id = id,
     userId = userId,
@@ -39,7 +32,7 @@ fun ChatMessageEntityRemote.toDomain() = ChatMessageEntity(
     badges = badges?.map { badge ->
         BadgeEntity(
             badgeType = badge.id,
-            url = badge.image_url_1x
+            url = badge.imageUrl1x
         )
     },
     emotes = emotes?.toDomain(),

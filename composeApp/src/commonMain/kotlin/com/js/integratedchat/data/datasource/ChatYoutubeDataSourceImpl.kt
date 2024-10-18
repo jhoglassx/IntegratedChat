@@ -1,18 +1,17 @@
 package com.js.integratedchat.data.datasource
 
-import Constants.EMOTE_REGEX
 import Constants.GOOGLE_LIVE_CHAT_ID
 import Constants.GOOGLE_TOKEN
 import co.touchlab.kermit.Logger
-import com.js.integratedchat.data.entity.BadgeResponse
 import com.js.integratedchat.data.entity.ChatMessageEntityRemote
-import com.js.integratedchat.data.entity.EmotePositionRemoteEntity
-import com.js.integratedchat.data.entity.EmoteRemoteEntity
-import com.js.integratedchat.data.entity.UserResponseRemoteEntity
+import com.js.integratedchat.data.entity.ChatYoutubeResponse
+import com.js.integratedchat.data.entity.LiveBroadcastsResponse
+import com.js.integratedchat.data.entity.UserRemoteEntity
+import com.js.integratedchat.data.entity.toRemote
 import com.js.integratedchat.ext.error
-import com.js.integratedchat.ext.parseDateTime
 import com.js.integratedchat.provider.DispatcherProvider
 import com.js.integratedchat.service.ApiService
+import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpMethod
@@ -23,10 +22,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 
 class ChatYoutubeDataSourceImpl(
     private val dispatcherProvider : DispatcherProvider,
@@ -35,7 +32,7 @@ class ChatYoutubeDataSourceImpl(
 
     @OptIn(InternalAPI::class)
     override suspend fun getYouTubeChat(
-        googleUser: UserResponseRemoteEntity
+        googleUser: UserRemoteEntity
     ): Flow<ChatMessageEntityRemote> = flow {
 
         var nextPageToken = ""
@@ -56,50 +53,17 @@ class ChatYoutubeDataSourceImpl(
                         )
                     )
 
-                    if (response.status == HttpStatusCode.OK) {val responseBody = response.bodyAsText()
-                        val json = Json.parseToJsonElement(responseBody).jsonObject
-                        val items = json["items"]?.jsonArray ?: emptyList()
-                        nextPageToken = json["nextPageToken"]?.jsonPrimitive?.contentOrNull ?: ""
+                    if (response.status == HttpStatusCode.OK) {
+                        val chatResponse = response.body<ChatYoutubeResponse>()
+                        val chatMessages = chatResponse.toRemote(
+                            googleUser = googleUser,
+                            badges = emptyList()
+                        )
 
-                        for (item in items) {
-                            val snippet = item.jsonObject["snippet"]?.jsonObject ?: continue
-                            val authorDetails =
-                                item.jsonObject["authorDetails"]?.jsonObject ?: continue
-                            val displayName =
-                                authorDetails["displayName"]?.jsonPrimitive?.contentOrNull
-                                    ?: continue
-                            val messageId =
-                                item.jsonObject["id"]?.jsonPrimitive?.contentOrNull ?: continue
-                            val publishedAt =
-                                snippet["publishedAt"]?.jsonPrimitive?.contentOrNull ?: continue
-                            val displayMessage =
-                                snippet["displayMessage"]?.jsonPrimitive?.contentOrNull ?: continue
-                            val timestamp = publishedAt.parseDateTime() ?: continue
-                            val userId = authorDetails["channelId"]?.jsonPrimitive?.contentOrNull
-                            val userName = authorDetails["channelId"]?.jsonPrimitive?.contentOrNull
-                            val channelId = GOOGLE_LIVE_CHAT_ID.toString()
-                            val channelName = googleUser.displayName ?: "Unknown"
-
-                            // Determine badges
-                            val badges = listOf<BadgeResponse>()
-                            val emotes = parseEmotes(displayMessage)
-
-                            emit(
-                                ChatMessageEntityRemote(
-                                    id = messageId,
-                                    userId = userId,
-                                    userName = userName,
-                                    displayName = displayName,
-                                    timestamp = timestamp,
-                                    message = displayMessage,
-                                    badges = badges,
-                                    emotes = emotes,
-                                    source = SourceEnum.YOUTUBE,
-                                    channelId = channelId,
-                                    channelName = channelName
-                                )
-                            )
+                        chatMessages.forEach {
+                            emit(it)
                         }
+                        break
                     } else {
                         Logger.error(
                             tag = "ChatYoutubeDataSourceImpl",
@@ -139,12 +103,11 @@ class ChatYoutubeDataSourceImpl(
                 )
 
                 if (response.status == HttpStatusCode.OK) {
-                    val responseBody = response.bodyAsText()
-                    val json = Json.parseToJsonElement(responseBody).jsonObject
-                    val items = json["items"]?.jsonArray ?: emptyList()
+                    val responseBody = response.body<LiveBroadcastsResponse>()
 
-                    emit(items.isNotEmpty())
-                    if(items.isNotEmpty()){
+                    val hasItems = responseBody.items.isNotEmpty()
+                    emit(hasItems)
+                    if(hasItems){
                         break
                     }
                 } else {
@@ -166,26 +129,5 @@ class ChatYoutubeDataSourceImpl(
             emit(false)
         }
     }.flowOn(dispatcherProvider.IO)
-
-    private fun parseEmotes(displayMessage: String): List<EmoteRemoteEntity> {
-        val emotes = mutableListOf<EmoteRemoteEntity>()
-        val matches = EMOTE_REGEX.findAll(displayMessage)
-
-        matches.forEach { match ->
-            val id = match.value
-            val start = match.range.first
-            val end = match.range.last + 1
-
-            emotes.add(
-                EmoteRemoteEntity(
-                    emoteId = id,
-                    imgUrl = EmoteUrlEnum.fromLabel(id).url ,
-                    positions = listOf(EmotePositionRemoteEntity(start, end))
-                )
-            )
-        }
-
-        return emotes
-    }
 }
 

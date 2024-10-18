@@ -5,6 +5,7 @@ import Constants.TWITCH_TOKEN
 import com.js.integratedchat.data.entity.ChatMessageEntityRemote
 import com.js.integratedchat.data.entity.EmotePositionRemoteEntity
 import com.js.integratedchat.data.entity.EmoteRemoteEntity
+import com.js.integratedchat.data.entity.SourceEnum
 import com.js.integratedchat.domain.entity.UserEntity
 import com.js.integratedchat.provider.BadgeCache
 import com.js.integratedchat.provider.DispatcherProvider
@@ -82,7 +83,7 @@ class ChatTwitchDataSourceImplTest {
             emotes = listOf(
                 EmoteRemoteEntity(
                     emoteId = "25",
-                    imgUrl = "",
+                    imgUrl = "https://static-cdn.jtvnw.net/emoticons/v2/25/default/dark/1.0",
                     positions = listOf(
                         EmotePositionRemoteEntity(0,4)
                     )

@@ -11,7 +11,6 @@ import org.koin.dsl.module
 
 actual val platformModule = module {
     singleOf(::AuthGoogleUseCase)
-    singleOf(::AuthTwitchUseCase)
     singleOf(::DispatcherProvider)
     single<SignInClient>{
         Identity.getSignInClient(androidContext())

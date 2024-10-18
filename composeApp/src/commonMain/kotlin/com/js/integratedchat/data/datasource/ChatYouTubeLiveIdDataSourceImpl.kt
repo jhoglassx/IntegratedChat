@@ -2,21 +2,17 @@ package com.js.integratedchat.data.datasource
 
 import Constants.GOOGLE_TOKEN
 import co.touchlab.kermit.Logger
+import com.js.integratedchat.data.entity.LiveChatIdResponse
 import com.js.integratedchat.ext.error
 import com.js.integratedchat.provider.DispatcherProvider
 import com.js.integratedchat.service.ApiService
+import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 
 class ChatYouTubeLiveIdDataSourceImpl(
     private val apiService: ApiService,
@@ -44,18 +40,13 @@ class ChatYouTubeLiveIdDataSourceImpl(
         )
 
         if (response.status == HttpStatusCode.OK) {
-            val responseBody = response.bodyAsText()
-            val json = Json.parseToJsonElement(responseBody).jsonObject
-            val items = json["items"]?.jsonArray ?: emptyList()
+            val responseBody = response.body<LiveChatIdResponse>()
 
-            var liveChatId = ""
+            val result = responseBody.items?.firstNotNullOfOrNull {
+                it.snippet?.liveChatId
+            } ?: ""
 
-            for (item in items) {
-                val snippet = item.jsonObject["snippet"]?.jsonObject ?: continue
-                liveChatId = snippet["liveChatId"]?.jsonPrimitive?.contentOrNull ?: ""
-            }
-
-            emit(liveChatId)
+            emit(result)
         } else {
             val error = Exception("Failed to fetch live chat ID: $response")
             Logger.error(

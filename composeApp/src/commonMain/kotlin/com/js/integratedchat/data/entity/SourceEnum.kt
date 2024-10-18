@@ -1,4 +1,4 @@
-package com.js.integratedchat.data.datasource
+package com.js.integratedchat.data.entity
 
 import androidx.compose.ui.graphics.Color
 import integratedchat.composeapp.generated.resources.Res

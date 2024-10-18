@@ -3,6 +3,8 @@ package com.js.integratedchat.ui.auth
 import co.touchlab.kermit.Logger
 import com.js.integratedchat.domain.usecase.AuthGoogleUseCase
 import com.js.integratedchat.domain.usecase.AuthTwitchUseCase
+import com.js.integratedchat.domain.usecase.UserGoogleUseCase
+import com.js.integratedchat.domain.usecase.UserTwitchUseCase
 import com.js.integratedchat.ext.error
 import com.js.integratedchat.ext.info
 import com.js.integratedchat.provider.DispatcherProvider
@@ -17,6 +19,8 @@ import kotlinx.coroutines.launch
 class AuthViewModel(
     private val authGoogleUseCase: AuthGoogleUseCase,
     private val authTwitchUseCase: AuthTwitchUseCase,
+    private val userGoogleUseCase: UserGoogleUseCase,
+    private val userTwitchUseCase: UserTwitchUseCase,
     dispatcherProvider: DispatcherProvider
 ): BaseViewModel(
     dispatcherProvider = dispatcherProvider
@@ -60,7 +64,7 @@ class AuthViewModel(
         viewModelScope.launch {
             authorizationCode?.let {
                 try {
-                     authGoogleUseCase.getUser(authorizationCode).collect { user ->
+                    userGoogleUseCase.getUser(authorizationCode).collect { user ->
                          _uiState.update {
                              it.copy(
                                  userGoggle = user
@@ -102,7 +106,7 @@ class AuthViewModel(
         viewModelScope.launch {
             authorizationCode?.let {
                 try {
-                    authTwitchUseCase.getUser(authorizationCode).collect { user ->
+                    userTwitchUseCase.getUser(authorizationCode).collect { user ->
                         _uiState.update {
                             it.copy(
                                 userTwitch = user

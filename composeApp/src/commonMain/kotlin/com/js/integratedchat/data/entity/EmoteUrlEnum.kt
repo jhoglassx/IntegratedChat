@@ -1,4 +1,4 @@
-package com.js.integratedchat.data.datasource
+package com.js.integratedchat.data.entity
 
 
 enum class EmoteUrlEnum(val url: String, val label: String) {
