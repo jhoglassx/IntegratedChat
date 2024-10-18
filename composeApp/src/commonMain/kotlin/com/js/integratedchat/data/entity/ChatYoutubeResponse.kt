@@ -2,8 +2,6 @@ package com.js.integratedchat.data.entity
 
 import Constants.EMOTE_REGEX
 import Constants.GOOGLE_LIVE_CHAT_ID
-import com.js.integratedchat.data.datasource.EmoteUrlEnum
-import com.js.integratedchat.data.datasource.SourceEnum
 import com.js.integratedchat.ext.parseDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

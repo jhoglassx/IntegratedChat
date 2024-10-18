@@ -1,6 +1,6 @@
 package com.js.integratedchat.domain.usecase
 
-import com.js.integratedchat.data.datasource.SourceEnum
+import com.js.integratedchat.data.entity.SourceEnum
 import com.js.integratedchat.data.repository.ChatYouTubeLiveIdRepository
 import com.js.integratedchat.data.repository.ChatYoutubeRepository
 import com.js.integratedchat.domain.entity.ChatMessageEntity

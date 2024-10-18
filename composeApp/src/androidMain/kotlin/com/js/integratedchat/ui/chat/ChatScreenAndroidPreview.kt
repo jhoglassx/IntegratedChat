@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.js.integratedchat.data.datasource.SourceEnum
+import com.js.integratedchat.data.entity.SourceEnum
 import com.js.integratedchat.domain.entity.ChatMessageEntity
 import com.js.integratedchat.ui.chat.model.ChatState
 

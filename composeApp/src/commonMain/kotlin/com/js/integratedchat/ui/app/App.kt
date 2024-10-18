@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.js.integratedchat.data.datasource.SourceEnum
+import com.js.integratedchat.data.entity.SourceEnum
 import com.js.integratedchat.ui.auth.model.AuthState
 import com.js.integratedchat.ui.chat.ChatScreen
 import com.js.integratedchat.ui.navigation.ChatNavigation
