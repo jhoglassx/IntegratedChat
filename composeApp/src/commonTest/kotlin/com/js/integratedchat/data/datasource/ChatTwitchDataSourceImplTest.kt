@@ -82,7 +82,7 @@ class ChatTwitchDataSourceImplTest {
             emotes = listOf(
                 EmoteRemoteEntity(
                     emoteId = "25",
-                    imgUrl = "",
+                    imgUrl = "https://static-cdn.jtvnw.net/emoticons/v2/25/default/dark/1.0",
                     positions = listOf(
                         EmotePositionRemoteEntity(0,4)
                     )
