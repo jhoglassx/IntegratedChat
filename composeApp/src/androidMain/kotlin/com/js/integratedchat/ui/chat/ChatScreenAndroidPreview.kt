@@ -6,6 +6,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.js.integratedchat.data.entity.SourceEnum
 import com.js.integratedchat.domain.entity.ChatMessageEntity
+import com.js.integratedchat.domain.entity.FilterOption
+import com.js.integratedchat.domain.entity.MessageTypeEnum
 import com.js.integratedchat.ui.chat.model.ChatState
 
 
@@ -22,7 +24,7 @@ fun ChatMessageAndroidPreview(){
                 message = "message_1",
                 source = SourceEnum.TWITCH,
                 channelId = "channelId_1",
-                channelName = "channelName_1"
+                channelName = "channelName_1",
             ),
             ChatMessageEntity(
                 id = "chatMessage_2",
@@ -32,13 +34,14 @@ fun ChatMessageAndroidPreview(){
                 message = "message_2",
                 source = SourceEnum.YOUTUBE,
                 channelId = "channelId_2",
-                channelName = "channelName_2"
+                channelName = "channelName_2",
             )
         )
     )
 
     ChatMessage(
         innerPadding = PaddingValues(12.dp),
-        chatState = chatState
+        chatState = chatState,
+        selectedFilter = FilterOption.ALL
     )
 }

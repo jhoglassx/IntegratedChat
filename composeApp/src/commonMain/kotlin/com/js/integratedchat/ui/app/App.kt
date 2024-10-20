@@ -4,11 +4,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
@@ -25,10 +27,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.js.integratedchat.data.entity.SourceEnum
+import com.js.integratedchat.domain.entity.FilterOption
 import com.js.integratedchat.ui.auth.model.AuthState
 import com.js.integratedchat.ui.chat.ChatScreen
 import com.js.integratedchat.ui.navigation.ChatNavigation
@@ -42,15 +46,20 @@ fun App(
 ) {
     MaterialTheme {
         val navController = rememberNavController()
+        var selectedFilter by remember { mutableStateOf(FilterOption.ALL) }
+
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             topBar = {
                 topBar(
-                    screanName = ChatNavigation.route,
+                    screenName = ChatNavigation.route,
                     onSignInTwitch = onSignInTwitch,
                     onSignInGoogle = onSignInGoogle,
-                    authState = authState
+                    authState = authState,
+                    onFilterSelected = { filterOption ->
+                        selectedFilter = filterOption
+                    }
                 )
             }
         ) { innerPadding ->
@@ -58,12 +67,11 @@ fun App(
                 navController = navController,
                 startDestination = ChatNavigation.route
             ) {
-                composable(
-                    route = ChatNavigation.route
-                ) {
+                composable(route = ChatNavigation.route) {
                     ChatScreen(
                         innerPadding = innerPadding,
-                        authState = authState
+                        authState = authState,
+                        selectedFilter = selectedFilter
                     )
                 }
             }
@@ -77,12 +85,14 @@ fun topBar(
     authState: AuthState,
     onSignInGoogle: () -> Unit,
     onSignInTwitch: () -> Unit,
-    screanName: String,
+    screenName: String,
+    onFilterSelected: (FilterOption) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    var filterExpanded by remember { mutableStateOf(false) }
 
     CenterAlignedTopAppBar(
-        title = { Text(screanName) },
+        title = { Text(screenName) },
         actions = {
             Icon(
                 painter = painterResource(SourceEnum.YOUTUBE.icon),
@@ -133,6 +143,26 @@ fun topBar(
                         DropdownMenuItem(
                             text = { Text("logout") },
                             onClick = { }
+                        )
+                    }
+                }
+            }
+
+            Box {
+                IconButton(onClick = { filterExpanded = true }) {
+                    Icon(Icons.Filled.FilterList, contentDescription = "Filter")
+                }
+                DropdownMenu(
+                    expanded = filterExpanded,
+                    onDismissRequest = { filterExpanded = false }
+                ) {
+                    FilterOption.entries.forEach { option ->
+                        DropdownMenuItem(
+                            onClick = {
+                                onFilterSelected(option) // Chama o callback com a opção selecionada
+                                filterExpanded = false
+                            },
+                            text = { Text(option.name) },
                         )
                     }
                 }

@@ -38,7 +38,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import coil3.compose.AsyncImage
+import com.js.integratedchat.data.entity.SourceEnum
 import com.js.integratedchat.domain.entity.ChatMessageEntity
+import com.js.integratedchat.domain.entity.FilterOption
 import com.js.integratedchat.domain.entity.processMessage
 import com.js.integratedchat.ui.auth.model.AuthState
 import com.js.integratedchat.ui.chat.model.ChatAction
@@ -50,7 +52,8 @@ import org.koin.compose.koinInject
 @Composable
 fun ChatScreen(
     innerPadding : PaddingValues,
-    authState: AuthState
+    authState: AuthState,
+    selectedFilter: FilterOption
 ) {
 
     val viewModel: ChatViewModel = koinInject ()
@@ -64,16 +67,27 @@ fun ChatScreen(
     }
     ChatMessage(
         innerPadding = innerPadding,
-        chatState = uiState
+        chatState = uiState,
+        selectedFilter = selectedFilter
     )
 }
+
 
 @Composable
 fun ChatMessage(
     innerPadding: PaddingValues,
-    chatState: ChatState
+    chatState: ChatState,
+    selectedFilter: FilterOption
 ) {
     val chatMessages =  chatState.chatMessages
+
+
+    val filteredMessages = when (selectedFilter) {
+        FilterOption.ALL -> chatMessages
+        FilterOption.YOUTUBE -> chatMessages.filter { it.source == SourceEnum.YOUTUBE }
+        FilterOption.TWITCH -> chatMessages.filter { it.source == SourceEnum.TWITCH }
+        FilterOption.UNREAD -> TODO()
+    }
 
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -85,10 +99,10 @@ fun ChatMessage(
         }
     }
 
-    LaunchedEffect(chatMessages) {
+    LaunchedEffect(filteredMessages) {
         if (isAtBottom) {
             coroutineScope.launch {
-                listState.animateScrollToItem(chatMessages.size - 2)
+                listState.animateScrollToItem(filteredMessages.size - 2)
             }
         }
     }
@@ -100,6 +114,7 @@ fun ChatMessage(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+
         Box(modifier = Modifier.weight(1f)) {
             LazyColumn(
                 state = listState,

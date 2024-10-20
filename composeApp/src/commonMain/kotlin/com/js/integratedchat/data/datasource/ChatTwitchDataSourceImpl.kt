@@ -2,7 +2,7 @@ package com.js.integratedchat.data.datasource
 
 import Constants.TWITCH_BADGES_CACHE
 import Constants.TWITCH_TOKEN
-import com.js.integratedchat.data.entity.ChatMessageEntityRemote
+import com.js.integratedchat.data.entity.ChatTwitchResponseEntity
 import com.js.integratedchat.data.entity.EmotePositionRemoteEntity
 import com.js.integratedchat.data.entity.EmoteRemoteEntity
 import com.js.integratedchat.data.entity.SourceEnum
@@ -20,7 +20,7 @@ class ChatTwitchDataSourceImpl(
 
     override suspend fun getTwitchChat(
         userEntity: UserEntity
-    ): Flow<ChatMessageEntityRemote> = flow {
+    ): Flow<ChatTwitchResponseEntity> = flow {
 
         badgeCache.start()
 
@@ -39,7 +39,7 @@ class ChatTwitchDataSourceImpl(
     private fun parseTwitchMessage(
         line: String,
         channel: String
-    ): ChatMessageEntityRemote? {
+    ): ChatTwitchResponseEntity? {
 
         val tagsPart = line.substringBefore(" :")
         val messagePart = line.substringAfter("PRIVMSG #$channel :")
@@ -86,7 +86,7 @@ class ChatTwitchDataSourceImpl(
             }
         }
 
-        return ChatMessageEntityRemote(
+        return ChatTwitchResponseEntity(
             id = tags["id"] ?: return null,
             userId = tags["user-id"],
             userName = tags["login"],
@@ -97,7 +97,14 @@ class ChatTwitchDataSourceImpl(
             emotes = emotes,
             source = SourceEnum.TWITCH,
             channelId = tags["room-id"],
-            channelName = channel
+            channelName = channel,
+            isSubscriber = tags["subscriber"] == "1",
+            isModerator = tags["mod"] == "1",
+            isVIP = tags["vip"] == "1",
+            color = tags["color"],
+            clientNonce = tags["client-nonce"],
+            messageType = tags["type"],
+            bits = tags["bits"]?.toIntOrNull()
         )
     }
 }

@@ -2,6 +2,7 @@ package com.js.integratedchat.data.entity
 
 import Constants.EMOTE_REGEX
 import Constants.GOOGLE_LIVE_CHAT_ID
+import com.js.integratedchat.domain.entity.MessageTypeEnum
 import com.js.integratedchat.ext.parseDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -17,7 +18,9 @@ data class ChatItem(
     val id: String,
     @SerialName("snippet")
     val message: Message,
-    val authorDetails: AuthorDetails
+    val authorDetails: AuthorDetails,
+    val superChatDetails: SuperChatDetails?,
+    val isPinned: Boolean
 )
 
 @Serializable
@@ -30,6 +33,15 @@ data class Message(
 data class AuthorDetails(
     val displayName: String,
     val channelId: String
+)
+
+@Serializable
+data class SuperChatDetails(
+    val amountMicros: String,
+    val currency: String,
+    val userChannelId: String,
+    val tier: Int,
+    val moderatorStatus: String,
 )
 
 fun ChatYoutubeResponse.toRemote(
