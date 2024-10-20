@@ -2,7 +2,6 @@ package com.js.integratedchat.data.entity
 
 import com.js.integratedchat.domain.entity.BadgeEntity
 import com.js.integratedchat.domain.entity.ChatMessageEntity
-import com.js.integratedchat.domain.entity.parseToMessageType
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable

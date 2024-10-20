@@ -7,7 +7,6 @@ import androidx.compose.ui.unit.dp
 import com.js.integratedchat.data.entity.SourceEnum
 import com.js.integratedchat.domain.entity.ChatMessageEntity
 import com.js.integratedchat.domain.entity.FilterOption
-import com.js.integratedchat.domain.entity.MessageTypeEnum
 import com.js.integratedchat.ui.chat.model.ChatState
 
 
