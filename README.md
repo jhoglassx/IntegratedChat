@@ -3,6 +3,8 @@
  <p>A study project to showcase skills and knowledge in developing applications with <strong>Kotlin Multiplatform (KMP)</strong>, <strong>Compose</strong>, <strong>Ktor</strong>, <strong>Koin</strong>, and <strong>MVI</strong>, integrating live chat from <strong>Twitch</strong> and <strong>YouTube</strong> platforms into a unified interface.</p>
 
   <img src="https://github.com/user-attachments/assets/3b5810c6-62fa-4a04-9a8d-d9d0856bf71b" alt="Texto alternativo" width="300" />
+  <img src="https://github.com/user-attachments/assets/91498920-00df-4690-85f2-869997431f6e" alt="Texto alternativo" width="600" />
+
 
   <h2>📋 Description</h2>
   <p>
