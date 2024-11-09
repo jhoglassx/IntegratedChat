@@ -18,8 +18,6 @@ data class ChatItem(
     @SerialName("snippet")
     val message: Message,
     val authorDetails: AuthorDetails,
-    val superChatDetails: SuperChatDetails?,
-    val isPinned: Boolean
 )
 
 @Serializable
@@ -33,16 +31,6 @@ data class AuthorDetails(
     val displayName: String,
     val channelId: String
 )
-
-@Serializable
-data class SuperChatDetails(
-    val amountMicros: String,
-    val currency: String,
-    val userChannelId: String,
-    val tier: Int,
-    val moderatorStatus: String,
-)
-
 fun ChatYoutubeResponse.toRemote(
     googleUser: UserRemoteEntity,
     badges: List<BadgeResponse>,
@@ -84,6 +72,5 @@ fun Message.parseEmotes(): List<EmoteRemoteEntity> {
             )
         )
     }
-
     return emotes
 }
