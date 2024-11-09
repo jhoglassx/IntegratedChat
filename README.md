@@ -28,14 +28,37 @@
       <li><strong>GitHub Actions</strong>: CI/CD for build automation and testing.</li>
     </ul>
   <h2>📂 Project Structure</h2>
-<pre><code>
-IntegratedChat/
-├── app/                # Main app module
-├── data/               # Data and API handling module
-├── domain/             # Business logic and data processing
-├── infrastructure/     # Integration configurations with external services
-├── ...                 # Additional modules as needed
-</code></pre>
+ <ul>
+   <li>
+     <p><strong><code>commonMain/</code></strong>: Contains shared code for both Android and Desktop platforms:</p>
+     <ul>
+       <li><strong><code>data/</code></strong>: Data models and persistence-related classes.</li>
+       <li><strong><code>domain.usecase/</code></strong>: Business logic and use cases.</li>
+       <li><strong><code>di/</code></strong>: Dependency injection configuration.</li>
+       <li><strong><code>provider/</code></strong>: Classes responsible for providing data or functionalities.</li>
+       <li><strong><code>ui/</code></strong>: Shared UI components between platforms.</li>
+     </ul>
+   </li>
+   <li>
+     <p><strong><code>androidApp/</code></strong>: Android-specific module:</p>
+     <ul>
+       <li><strong><code>src/</code></strong>: Android source code, including the main activity, layouts, and other components.</li>
+       <li><strong><code>res/</code></strong>: Android resources (images, strings, etc.).</li>
+     </ul>
+   </li>
+   <li>
+     <p><strong><code>desktopMain/</code></strong>: Desktop-specific module:</p>
+     <ul>
+       <li><strong><code>src/</code></strong>: Desktop source code, including the main window and other components.</li>
+     </ul>
+   </li>
+ </ul>
+  <li data-sourcepos="27:1-29:0"><strong>desktopMain:</strong> Módulo específico para a plataforma desktop, contendo:
+  <ul data-sourcepos="28:5-29:0">
+  <li data-sourcepos="28:5-29:0"><strong>src:</strong> Código fonte desktop, incluindo a janela principal e outros componentes.</li>
+  </ul>
+  </li>
+  </ul>
   <h2>🧩 Principles and Architecture</h2>
   <p>This project follows the principles of <strong>Clean Code</strong>, <strong>Clean Architecture</strong>, and <strong>SOLID</strong> to ensure code readability, maintainability, and scalability:</p>
   <ul>
