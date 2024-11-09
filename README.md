@@ -1,13 +1,13 @@
 <div class="markdown prose w-full break-words dark:prose-invert dark">
-  
-  <h1>IntegratedChat</h1>
-  ![image](https://github.com/user-attachments/assets/3b5810c6-62fa-4a04-9a8d-d9d0856bf71b)
+ <h1>IntegratedChat</h1>
+ <p>A study project to showcase skills and knowledge in developing applications with <strong>Kotlin Multiplatform (KMP)</strong>, <strong>Compose</strong>, <strong>Ktor</strong>, <strong>Koin</strong>, and <strong>MVI</strong>, integrating live chat from <strong>Twitch</strong> and <strong>YouTube</strong> platforms into a unified interface.</p>
 
-  <p>A study project to showcase skills and knowledge in developing applications with <strong>Kotlin Multiplatform (KMP)</strong>, <strong>Compose</strong>, <strong>Ktor</strong>, <strong>Koin</strong>, and <strong>MVI</strong>, integrating live chat from <strong>Twitch</strong> and <strong>YouTube</strong> platforms into a unified interface.</p>
+  <img src="https://github.com/user-attachments/assets/3b5810c6-62fa-4a04-9a8d-d9d0856bf71b" alt="Texto alternativo" width="300" />
+
   <h2>📋 Description</h2>
-    <p>
-      <strong>IntegratedChat</strong> is a cross-platform application designed for Android and Desktop. This project consolidates live chats from Twitch and YouTube into a unified interface, with a design inspired by both platforms but featuring a unique, unified look.
-    </p>
+  <p>
+    <strong>IntegratedChat</strong> is a cross-platform application designed for Android and Desktop. This project consolidates live chats from Twitch and YouTube into a unified interface, with a design inspired by both platforms but featuring a unique, unified look.
+  </p>
   <h2>🎯 Objective</h2>
     <p>
       This project aims to demonstrate the capability to develop complex cross-platform applications using KMP, implementing various libraries and modern development patterns, such as MVI and dependency injection with Koin. It serves as a practical study to deepen knowledge in Android and Desktop development.
